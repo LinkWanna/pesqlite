@@ -1,0 +1,452 @@
+stmt = _{ SOI ~ (dml | ddl) ~ EOI }
+
+// DML 语句
+dml    = _{ select | insert | update | delete }
+select =  { (select_core ~ (compound_operator ~ select_core)*) ~ (^"ORDER" ~ ^"BY" ~ ordering_terms)? ~ (^"LIMIT" ~ expr ~ ((^"OFFSET" | ",") ~ expr)?)? }
+insert =  { insert_header ~ ^"INTO" ~ schema_object ~ (^"AS" ~ ident)? ~ ("(" ~ idents ~ ")")? ~ insert_body ~ return_clause? }
+update =  { ^"UPDATE" ~ (^"OR" ~ conflict_resolution)? ~ qualified_table ~ set_clause ~ from_clause? ~ where_clause? ~ return_clause? }
+delete =  { ^"DELETE" ~ ^"FROM" ~ qualified_table ~ where_clause? ~ return_clause? }
+
+// DDL 语句
+ddl            = _{ create_table | create_view | create_index | create_trigger | alter_table | drop_table | drop_view | drop_index | drop_trigger }
+create_table   =  { ^"CREATE" ~ temp? ~ ^"TABLE" ~ if_not_exists? ~ schema_object ~ create_table_body }
+create_view    =  { ^"CREATE" ~ temp? ~ ^"VIEW" ~ if_not_exists? ~ schema_object ~ "(" ~ idents ~ ")" ~ ^"AS" ~ select }
+create_index   =  { ^"CREATE" ~ unique? ~ ^"INDEX" ~ if_not_exists? ~ schema_object ~ ^"ON" ~ ident ~ "(" ~ indexed_columns ~ ")" ~ where_clause? }
+create_trigger =  { ^"CREATE" ~ temp? ~ ^"TRIGGER" ~ if_not_exists? ~ schema_object ~ trigger_timing ~ trigger_event ~ ^"ON" ~ ident ~ (^"FOR" ~ ^"EACH" ~ ^"ROW")? ~ when_clause? ~ ^"BEGIN" ~ (dml ~ ";")+ ~ ^"END" }
+alter_table    =  { ^"ALTER" ~ ^"TABLE" ~ schema_object ~ alter_table_action }
+drop_table     =  { ^"DROP" ~ ^"TABLE" ~ if_exists? ~ schema_object }
+drop_view      =  { ^"DROP" ~ ^"VIEW" ~ if_exists? ~ schema_object }
+drop_index     =  { ^"DROP" ~ ^"INDEX" ~ if_exists? ~ schema_object }
+drop_trigger   =  { ^"DROP" ~ ^"TRIGGER" ~ if_exists? ~ schema_object }
+
+/* -------------------------- 语义封装 -------------------------- */
+schema_object   = { (ident ~ ".")? ~ ident }
+qualified_table = { schema_object ~ (^"AS" ~ ident)? ~ indexed? }
+
+// schema.table.column 结构
+qualified_column  =  { (qualified_column1 | qualified_column2)? ~ ident }
+qualified_column1 = _{ ident ~ "." ~ ident ~ "." }
+qualified_column2 = _{ ident ~ "." }
+
+indexed  = _{ indexed1 | indexed2 }
+indexed1 =  { ^"INDEXED" ~ ^"BY" ~ ident }
+indexed2 =  { ^"NOT" ~ ^"INDEXED" }
+
+// 排序方式
+order = _{ asc | desc }
+asc   =  { ^"ASC" }
+desc  =  { ^"DESC" }
+
+// DISTINCT 或 ALL 关键字
+is_distinct = _{ distinct | all }
+distinct    =  { ^"DISTINCT" }
+all         =  { ^"ALL" }
+
+// 空值控制
+nulls_ctrl = _{ ^"NULLS" ~ (first | last) }
+first      =  { ^"FIRST" }
+last       =  { ^"LAST" }
+
+// where 子句
+where_clause = _{ ^"WHERE" ~ expr }
+
+// 冲突解决策略
+conflict_resolution = { abort | fail | ignore | replace | rollback }
+abort               = { ^"ABORT" }
+fail                = { ^"FAIL" }
+ignore              = { ^"IGNORE" }
+replace             = { ^"REPLACE" }
+rollback            = { ^"ROLLBACK" }
+
+/* -------------------------- DML -------------------------- */
+
+// returning 子句
+return_clause      =  { ^"RETURNING" ~ return_sub_clause ~ ("," ~ return_sub_clause)* }
+return_sub_clause  = _{ return_sub_clause1 | return_sub_clause2 }
+return_sub_clause1 =  { "*" }
+return_sub_clause2 =  { expr ~ (^"AS"? ~ ident)? }
+
+// Join 子句
+join_clause     = { qualified_table ~ join_sub_clause* }
+join_sub_clause = { join_operator ~ qualified_table ~ join_constraint? }
+
+// Join 操作符
+join_operator   =  { join_operator1 | join_operator2 | join_operator3 }
+join_operator1  =  { "," }
+join_operator2  =  { ^"CROSS" ~ ^"JOIN" }
+join_operator3  =  { natural? ~ (join_operator31 | join_operator32) }
+join_operator31 =  { ^"INNER"? ~ ^"JOIN" }
+join_operator32 = _{ (left | right | full) ~ ^"OUTER"? ~ ^"JOIN" }
+left            =  { ^"LEFT" }
+right           =  { ^"RIGHT" }
+full            =  { ^"FULL" }
+
+// Join 表约束
+join_constraint  =  { join_constraint1 | join_constraint2 }
+join_constraint1 = _{ ^"ON" ~ expr }
+join_constraint2 = _{ ^"USING" ~ "(" ~ idents ~ ")" }
+
+// FROM 子句
+from_clause  = { ^"FROM" ~ from_clause1 | from_clause2 }
+from_clause1 = { qualified_table ~ ("," ~ qualified_table)* }
+from_clause2 = { join_clause }
+
+values = { expr_list ~ ("," ~ expr_list)* }
+
+/* -------------------------- insert -------------------------- */
+insert_header  = _{ insert_header1 | insert_header2 }
+insert_header1 =  { ^"INSERT" ~ (^"OR" ~ conflict_resolution)? }
+insert_header2 =  { ^"REPLACE" }
+
+insert_body  = _{ insert_body1 | insert_body2 | insert_body3 }
+insert_body1 =  { ^"VALUES" ~ values ~ upsert_clause? }
+insert_body2 =  { select ~ upsert_clause? }
+insert_body3 =  { ^"DEFAULT" ~ ^"VALUES" }
+
+upsert_clause      = { upsert_sub_clause ~ ("," ~ upsert_sub_clause)* }
+upsert_sub_clause  = { ^"ON" ~ ^"CONFLICT" ~ conflict_columns? ~ ^"DO" ~ (upsert_sub_clause1 | upsert_sub_clause2) }
+upsert_sub_clause1 = { ^"NOTHING" }
+upsert_sub_clause2 = { ^"UPDATE" ~ set_clause ~ where_clause? }
+
+conflict_columns = { "(" ~ indexed_columns ~ ")" ~ where_clause? }
+
+/* -------------------------- update -------------------------- */
+set_clause     = { ^"SET" ~ set_sub_clause ~ ("," ~ set_sub_clause)* }
+set_sub_clause = { ("(" ~ idents ~ ")" | ident) ~ "=" ~ expr }
+
+/* -------------------------- select -------------------------- */
+
+// select 核心部分
+select_core  = _{ select_core1 | select_core2 }
+select_core1 =  { ^"SELECT" ~ is_distinct? ~ result_columns ~ from_clause? ~ where_clause? ~ (^"GROUP" ~ ^"BY" ~ exprs)? ~ (^"HAVING" ~ expr)? }
+select_core2 =  { ^"VALUES" ~ values }
+
+// 排序子句
+ordering_terms = { ordering_term ~ ("," ~ ordering_term)* }
+ordering_term  = { expr ~ order? ~ nulls_ctrl? }
+
+// 被选择的列
+result_columns = { result_column ~ ("," ~ result_column)* }
+result_column  = { result_column1 | result_column2 | result_column3 }
+result_column1 = { expr ~ (^"AS"? ~ ident)? }
+result_column2 = { "*" }
+result_column3 = { ident ~ "." ~ "*" }
+
+// 复合操作符
+compound_operator = { union_all | union | intersect | except }
+union             = { ^"UNION" }
+union_all         = { ^"UNION" ~ ^"ALL" }
+intersect         = { ^"INTERSECT" }
+except            = { ^"EXCEPT" }
+
+/* -------------------------- DDL -------------------------- */
+
+// 列定义
+column_defs = { column_def ~ ("," ~ column_def)* }
+column_def  = { ident ~ type_name? ~ column_constraints }
+
+// 列级约束
+column_constraints = { column_constraint* }
+column_constraint  = { (^"CONSTRAINT" ~ ident)? ~ (column_constraint1 | column_constraint2 | column_constraint3 | column_constraint4 | column_constraint5) }
+column_constraint1 = { ^"PRIMARY" ~ ^"KEY" ~ order? ~ conflict_clause? ~ auto_increment? }
+column_constraint2 = { ^"NOT" ~ ^"NULL" ~ conflict_clause? }
+column_constraint3 = { ^"UNIQUE" ~ conflict_clause? }
+column_constraint4 = { ^"CHECK" ~ "(" ~ expr ~ ")" }
+column_constraint5 = { ^"DEFAULT" ~ literal }
+
+// 约束冲突
+conflict_clause = { ^"ON" ~ ^"CONFLICT" ~ conflict_resolution }
+
+/* -------------------------- create table -------------------------- */
+
+create_table_body  =  { create_table_body1 | create_table_body2 }
+create_table_body1 = _{ ^"AS" ~ select }
+create_table_body2 = _{ "(" ~ column_defs ~ table_constraints ~ ")" ~ table_option* }
+
+// 表级约束
+table_constraints = { ("," ~ table_constraint)* }
+table_constraint  = { (^"CONSTRAINT" ~ ident)? ~ (table_constraint1 | table_constraint2) }
+table_constraint1 = { ^"PRIMARY" ~ ^"KEY" ~ "(" ~ indexed_columns ~ ")" ~ conflict_clause? }
+table_constraint2 = { ^"UNIQUE" ~ "(" ~ indexed_columns ~ ")" ~ conflict_clause? }
+
+indexed_columns = { indexed_column ~ ("," ~ indexed_column)* }
+indexed_column  = { ident ~ order? }
+
+// 表选项
+table_option  = _{ without_rowid | strict }
+without_rowid =  { ^"WITHOUT" ~ ^"ROWID" }
+strict        =  { ^"STRICT" }
+
+/* -------------------------- alter table -------------------------- */
+alter_table_action  = _{ alter_table_action1 | alter_table_action2 | alter_table_action3 | alter_table_action4 }
+alter_table_action1 =  { ^"RENAME" ~ ^"TO" ~ ident }
+alter_table_action2 =  { ^"RENAME" ~ ^"COLUMN"? ~ ident ~ ^"TO" ~ ident }
+alter_table_action3 =  { ^"ADD" ~ ^"COLUMN"? ~ column_def }
+alter_table_action4 =  { ^"DROP" ~ ^"COLUMN"? ~ ident }
+
+/* -------------------------- create trigger -------------------------- */
+
+// 触发器时机
+trigger_timing = _{ before | after | instead }
+before         =  { ^"BEFORE" }
+after          =  { ^"AFTER" }
+instead        =  { ^"INSTEAD" ~ ^"OF" }
+
+// 触发器事件
+trigger_event  = _{ trigger_event1 | trigger_event2 | trigger_event3 }
+trigger_event1 =  { ^"DELETE" }
+trigger_event2 =  { ^"INSERT" }
+trigger_event3 =  { ^"UPDATE" ~ (^"OF" ~ idents)? }
+
+// 触发器子句
+when_clause = { ^"WHEN" ~ "(" ~ expr ~ ")" }
+
+/// 字面量
+literal =  { true | false | null | double | decimal | integer | string | blob }
+true    =  { ^"TRUE" }
+false   =  { ^"FALSE" }
+null    =  { ^"NULL" }
+double  = @{ integer? ~ ("." ~ ASCII_DIGIT*)? ~ (^"E" ~ integer) }
+decimal = @{ integer? ~ ("." ~ ASCII_DIGIT*) }
+integer = @{ ("+" | "-")? ~ ASCII_DIGIT+ }
+string  = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
+blob    = @{ ^"X" ~ "'" ~ (ASCII_HEX_DIGIT)* ~ "'" }
+
+idents       =  { ident ~ ("," ~ ident)* }
+ident        =  { quoted_ident | ident_inner }
+quoted_ident = @{ "\"" ~ ident_inner ~ "\"" }
+ident_inner  = @{ !(keyword ~ ("(" | WHITESPACE | "," | ";")) ~ (ident_start ~ (ident_cont)*) }
+ident_start  = @{ ASCII_ALPHA | "_" }
+ident_cont   = @{ ASCII_ALPHANUMERIC | "_" }
+keyword      =  {
+    ^"ABORT"
+  | ^"ACTION"
+  | ^"ADD"
+  | ^"AFTER"
+  | ^"ALL"
+  | ^"ALTER"
+  | ^"ALWAYS"
+  | ^"ANALYZE"
+  | ^"AND"
+  | ^"AS"
+  | ^"ASC"
+  | ^"ATTACH"
+  | ^"AUTOINCREMENT"
+  | ^"BEFORE"
+  | ^"BEGIN"
+  | ^"BETWEEN"
+  | ^"BY"
+  | ^"CASCADE"
+  | ^"CASE"
+  | ^"CAST"
+  | ^"CHECK"
+  | ^"COLLATE"
+  | ^"COLUMN"
+  | ^"COMMIT"
+  | ^"CONFLICT"
+  | ^"CONSTRAINT"
+  | ^"CREATE"
+  | ^"CROSS"
+  | ^"CURRENT"
+  | ^"CURRENT_DATE"
+  | ^"CURRENT_TIME"
+  | ^"CURRENT_TIMESTAMP"
+  | ^"DATABASE"
+  | ^"DEFAULT"
+  | ^"DEFERRABLE"
+  | ^"DEFERRED"
+  | ^"DELETE"
+  | ^"DESC"
+  | ^"DETACH"
+  | ^"DISTINCT"
+  | ^"DO"
+  | ^"DROP"
+  | ^"EACH"
+  | ^"ELSE"
+  | ^"END"
+  | ^"ESCAPE"
+  | ^"EXCEPT"
+  | ^"EXCLUDE"
+  | ^"EXCLUSIVE"
+  | ^"EXISTS"
+  | ^"EXPLAIN"
+  | ^"FAIL"
+  | ^"FILTER"
+  | ^"FIRST"
+  | ^"FOLLOWING"
+  | ^"FOR"
+  | ^"FOREIGN"
+  | ^"FROM"
+  | ^"FULL"
+  | ^"GENERATED"
+  | ^"GLOB"
+  | ^"GROUP"
+  | ^"GROUPS"
+  | ^"HAVING"
+  | ^"IF"
+  | ^"IGNORE"
+  | ^"IMMEDIATE"
+  | ^"IN"
+  | ^"INDEX"
+  | ^"INDEXED"
+  | ^"INITIALLY"
+  | ^"INNER"
+  | ^"INSERT"
+  | ^"INSTEAD"
+  | ^"INTERSECT"
+  | ^"INTO"
+  | ^"IS"
+  | ^"ISNULL"
+  | ^"JOIN"
+  | ^"KEY"
+  | ^"LAST"
+  | ^"LEFT"
+  | ^"LIKE"
+  | ^"LIMIT"
+  | ^"MATCH"
+  | ^"MATERIALIZED"
+  | ^"NATURAL"
+  | ^"NO"
+  | ^"NOT"
+  | ^"NOTHING"
+  | ^"NOTNULL"
+  | ^"NULL"
+  | ^"NULLS"
+  | ^"OF"
+  | ^"OFFSET"
+  | ^"ON"
+  | ^"OR"
+  | ^"ORDER"
+  | ^"OTHERS"
+  | ^"OUTER"
+  | ^"OVER"
+  | ^"PARTITION"
+  | ^"PLAN"
+  | ^"PRAGMA"
+  | ^"PRECEDING"
+  | ^"PRIMARY"
+  | ^"QUERY"
+  | ^"RAISE"
+  | ^"RANGE"
+  | ^"RECURSIVE"
+  | ^"REFERENCES"
+  | ^"REGEXP"
+  | ^"REINDEX"
+  | ^"RELEASE"
+  | ^"RENAME"
+  | ^"REPLACE"
+  | ^"RESTRICT"
+  | ^"RETURNING"
+  | ^"RIGHT"
+  | ^"ROLLBACK"
+  | ^"ROW"
+  | ^"ROWS"
+  | ^"SAVEPOINT"
+  | ^"SELECT"
+  | ^"SET"
+  | ^"TABLE"
+  | ^"TEMP"
+  | ^"TEMPORARY"
+  | ^"THEN"
+  | ^"TIES"
+  | ^"TO"
+  | ^"TRANSACTION"
+  | ^"TRIGGER"
+  | ^"UNBOUNDED"
+  | ^"UNION"
+  | ^"UNIQUE"
+  | ^"UPDATE"
+  | ^"USING"
+  | ^"VACUUM"
+  | ^"VALUES"
+  | ^"VIEW"
+  | ^"VIRTUAL"
+  | ^"WHEN"
+  | ^"WHERE"
+  | ^"WINDOW"
+  | ^"WITH"
+  | ^"WITHOUT"
+}
+
+unsigned = @{ ASCII_DIGIT+ }
+
+/// 数据类型
+type_name    =  { type_def ~ ("(" ~ unsigned ~ ("," ~ unsigned)? ~ ")")? }
+type_def     = _{ type_decimal | type_double | type_int | type_string | type_varchar }
+type_decimal =  { ^"decimal" }
+type_double  =  { ^"double" }
+type_int     =  { ^"integer" | ^"int" }
+type_string  =  { ^"string" }
+type_varchar =  { ^"varchar" }
+
+/// 表达式
+expr  = { prefix? ~ primary ~ (infix ~ prefix? ~ primary)* }
+exprs = { expr ~ ("," ~ expr)* }
+
+primary   = _{ literal | qualified_column | expr_list }
+expr_list = _{ "(" ~ exprs ~ ")" }
+
+// 一元运算符
+prefix      = _{ logical_not | bitwise_not | positive | negative }
+bitwise_not =  { "~" }
+positive    =  { "+" }
+negative    =  { "-" }
+logical_not =  { ^"NOT" }
+
+// 二元运算符
+infix       = _{
+    logical_or
+  | logical_and
+  | concat
+  | mul
+  | div
+  | mod
+  | plus
+  | minus
+  | bitwise_and
+  | bitwise_or
+  | right_shift
+  | left_shift
+  | le
+  | lt
+  | ge
+  | gt
+  | eq
+  | ne
+  | is_not
+  | is
+}
+concat      =  { "||" }
+mul         =  { "*" }
+div         =  { "/" }
+mod         =  { "%" }
+plus        =  { "+" }
+minus       =  { "-" }
+bitwise_and =  { "&" }
+bitwise_or  =  { "|" }
+right_shift =  { ">>" }
+left_shift  =  { "<<" }
+le          =  { "<=" }
+lt          =  { "<" }
+ge          =  { ">=" }
+gt          =  { ">" }
+eq          =  { "=" | "==" }
+ne          =  { "!=" | "<>" }
+is_not      =  { ^"IS" ~ ^"NOT " }
+is          =  { ^"IS " }
+logical_and =  { ^"AND " }
+logical_or  =  { ^"OR " }
+
+// 基础词法
+natural        = { ^"NATURAL" }
+auto_increment = { ^"AUTOINCREMENT" }
+unique         = { ^"UNIQUE" }
+temp           = { ^"TEMP" | ^"TEMPORARY" }
+if_exists      = { ^"IF" ~ ^"EXISTS" }
+if_not_exists  = { ^"IF" ~ ^"NOT" ~ ^"EXISTS" }
+
+/// 空格描述
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+
+/// 注释描述
+COMMENT = _{ "--" ~ (!"\n" ~ ANY)* }
