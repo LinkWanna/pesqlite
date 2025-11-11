@@ -1,7 +1,7 @@
 mod ddl;
 mod dml;
 
-use crate::{BinaryOp, ConflictResolution, Expr, Literal, Rule, SchemaObject, UnaryOp};
+use crate::{Rule, ast::*};
 use pest::{
     iterators::Pair,
     pratt_parser::{Assoc, Op, PrattParser},
@@ -9,6 +9,29 @@ use pest::{
 
 pub trait Parser {
     fn parse(pair: Pair<Rule>) -> Self;
+}
+
+impl Parser for Stmt {
+    fn parse(pair: Pair<Rule>) -> Self {
+        let pair = pair.into_inner().next().unwrap();
+
+        match pair.as_rule() {
+            Rule::select => Stmt::Select(Select::parse(pair)),
+            Rule::insert => Stmt::Insert(Insert::parse(pair)),
+            Rule::update => Stmt::Update(Update::parse(pair)),
+            Rule::delete => Stmt::Delete(Delete::parse(pair)),
+            Rule::create_table => Stmt::CreateTable(CreateTable::parse(pair)),
+            Rule::create_index => Stmt::CreateIndex(CreateIndex::parse(pair)),
+            Rule::create_view => Stmt::CreateView(CreateView::parse(pair)),
+            Rule::create_trigger => Stmt::CreateTrigger(CreateTrigger::parse(pair)),
+            Rule::alter_table => Stmt::AlterTable(AlterTable::parse(pair)),
+            Rule::drop_table => Stmt::DropTable(DropTable::parse(pair)),
+            Rule::drop_index => Stmt::DropIndex(DropIndex::parse(pair)),
+            Rule::drop_view => Stmt::DropView(DropView::parse(pair)),
+            Rule::drop_trigger => Stmt::DropTrigger(DropTrigger::parse(pair)),
+            _ => unreachable!("Unexpected statement rule: {:?}", pair.as_rule()),
+        }
+    }
 }
 
 lazy_static::lazy_static! {
@@ -163,7 +186,6 @@ impl Parser for SchemaObject {
     }
 }
 
-/// 解析标识符
 impl Parser for String {
     fn parse(pair: Pair<Rule>) -> Self {
         let pair = pair.into_inner().next().unwrap();
@@ -179,7 +201,6 @@ impl Parser for String {
     }
 }
 
-/// 解析冲突解决策略
 impl Parser for ConflictResolution {
     fn parse(pair: Pair<Rule>) -> Self {
         let pair = pair.into_inner().next().unwrap();

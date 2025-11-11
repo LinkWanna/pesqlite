@@ -6,7 +6,22 @@ pub use crate::ast::dml::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
+    // 数据操作语言（DML）
     Select(Select),
+    Insert(Insert),
+    Update(Update),
+    Delete(Delete),
+
+    // 数据定义语言（DDL）
+    CreateTable(CreateTable),
+    CreateIndex(CreateIndex),
+    CreateView(CreateView),
+    CreateTrigger(CreateTrigger),
+    AlterTable(AlterTable),
+    DropTable(DropTable),
+    DropIndex(DropIndex),
+    DropView(DropView),
+    DropTrigger(DropTrigger),
 }
 
 /// 字面量
@@ -83,7 +98,7 @@ pub enum UnaryOp {
     LogicalNot, // NOT
 }
 
-/// 模式名和表名
+/// 模式名.对象名
 #[derive(Clone, Debug, PartialEq)]
 pub struct SchemaObject {
     pub schema_name: Option<String>,

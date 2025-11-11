@@ -1,12 +1,5 @@
+use crate::{Rule, ast::*, parser::Parser};
 use pest::iterators::Pair;
-
-use crate::{
-    AlterTable, AlterTableAction, ColumnConstraint, ColumnConstraintType, ColumnDef, CreateIndex,
-    CreateTable, CreateTableBody, CreateTrigger, CreateView, Delete, Dml, DropIndex, DropTable,
-    DropTrigger, DropView, Expr, IndexedColumn, Insert, Literal, Parser, Rule, SchemaObject,
-    Select, TableConstraint, TableConstraintType, TableOption, TriggerEvent, TriggerTiming,
-    TypeDef, TypeName, TypeSize, Update,
-};
 
 impl Parser for CreateTable {
     fn parse(pair: Pair<Rule>) -> Self {

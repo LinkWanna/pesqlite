@@ -1,4 +1,5 @@
-stmt = _{ SOI ~ (dml | ddl) ~ EOI }
+stmts = _{ SOI ~ stmt+ ~ EOI }
+stmt  =  { (dml | ddl) ~ ";" }
 
 // DML 语句
 dml    = _{ select | insert | update | delete }
