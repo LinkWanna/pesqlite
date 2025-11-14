@@ -1,5 +1,5 @@
 stmts = _{ SOI ~ stmt+ ~ EOI }
-stmt  =  { (dml | ddl) ~ ";" }
+stmt  =  { (dml | ddl | tcl) ~ ";" }
 
 // DML 语句
 dml    = _{ select | insert | update | delete }
@@ -19,6 +19,14 @@ drop_table     =  { ^"DROP" ~ ^"TABLE" ~ if_exists? ~ schema_object }
 drop_view      =  { ^"DROP" ~ ^"VIEW" ~ if_exists? ~ schema_object }
 drop_index     =  { ^"DROP" ~ ^"INDEX" ~ if_exists? ~ schema_object }
 drop_trigger   =  { ^"DROP" ~ ^"TRIGGER" ~ if_exists? ~ schema_object }
+
+// TCL 语句
+tcl      = _{ begin | commit | rollback | save | release }
+begin    =  { ^"BEGIN" ~ transaction_type? ~ ^"TRANSACTION"? }
+commit   =  { (^"COMMIT" | ^"END") ~ ^"TRANSACTION"? }
+rollback =  { ^"ROLLBACK" ~ ^"TRANSACTION"? ~ (^"TO" ~ ^"SAVEPOINT"? ~ ident)? }
+save     =  { ^"SAVEPOINT" ~ ident }
+release  =  { ^"RELEASE" ~ ^"SAVEPOINT"? ~ ident }
 
 /* -------------------------- 语义封装 -------------------------- */
 schema_object   = { (ident ~ ".")? ~ ident }
@@ -52,12 +60,12 @@ last       =  { ^"LAST" }
 where_clause = _{ ^"WHERE" ~ expr }
 
 // 冲突解决策略
-conflict_resolution = { abort | fail | ignore | replace | rollback }
+conflict_resolution = { abort | fail | ignore | replace | rollback_kw }
 abort               = { ^"ABORT" }
 fail                = { ^"FAIL" }
 ignore              = { ^"IGNORE" }
 replace             = { ^"REPLACE" }
-rollback            = { ^"ROLLBACK" }
+rollback_kw         = { ^"ROLLBACK" }
 
 /* -------------------------- DML -------------------------- */
 
@@ -201,6 +209,12 @@ trigger_event3 =  { ^"UPDATE" ~ (^"OF" ~ idents)? }
 
 // 触发器子句
 when_clause = { ^"WHEN" ~ "(" ~ expr ~ ")" }
+
+/* -------------------------- TCL -------------------------- */
+transaction_type = _{ deferred | immediate | exclusive }
+deferred         =  { ^"DEFERRED" }
+immediate        =  { ^"IMMEDIATE" }
+exclusive        =  { ^"EXCLUSIVE" }
 
 /* -------------------------- 词法定义 -------------------------- */
 

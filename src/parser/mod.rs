@@ -1,5 +1,6 @@
 mod ddl;
 mod dml;
+mod tcl;
 
 use crate::{Rule, ast::*};
 use pest::{
@@ -209,7 +210,7 @@ impl Parser for ConflictResolution {
             Rule::fail => ConflictResolution::Fail,
             Rule::ignore => ConflictResolution::Ignore,
             Rule::replace => ConflictResolution::Replace,
-            Rule::rollback => ConflictResolution::Rollback,
+            Rule::rollback_kw => ConflictResolution::Rollback,
             rule => unreachable!("Unexpected rule: {:?}", rule),
         }
     }

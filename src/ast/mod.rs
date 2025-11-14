@@ -1,8 +1,10 @@
 mod ddl;
 mod dml;
+mod tcl;
 
 pub use crate::ast::ddl::*;
 pub use crate::ast::dml::*;
+pub use crate::ast::tcl::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
@@ -36,6 +38,7 @@ pub enum Literal {
     Bool(bool),      // 布尔值
 }
 
+/// 表达式
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
     Literal(Literal),                       // 字面量
