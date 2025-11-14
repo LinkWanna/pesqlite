@@ -100,17 +100,8 @@ pub struct ColumnDef {
 /// 字段类型
 #[derive(Clone, Debug, PartialEq)]
 pub struct TypeName {
-    pub ty: TypeDef,
+    pub name: String, // 类型名称，由后端解析为具体类型
     pub size: Option<TypeSize>,
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum TypeDef {
-    Decimal,
-    Double,
-    Integer,
-    String,
-    Varchar,
 }
 
 /// 字段类型大小

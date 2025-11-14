@@ -191,7 +191,7 @@ impl Parser for String {
         let pair = pair.into_inner().next().unwrap();
 
         match pair.as_rule() {
-            Rule::ident_inner => pair.as_str().to_owned(),
+            Rule::ident_inner => pair.as_str().to_lowercase(),
             Rule::quoted_ident => {
                 let str = pair.as_str();
                 str[1..str.len() - 1].to_owned()

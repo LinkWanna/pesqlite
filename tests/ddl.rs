@@ -27,7 +27,7 @@ test_parse!(
                         ColumnDef {
                             col_name: "id".to_owned(),
                             col_type: Some(TypeName {
-                                ty: TypeDef::Integer,
+                                name: "integer".to_owned(),
                                 size: None,
                             }),
                             constraints: vec![],
@@ -35,7 +35,7 @@ test_parse!(
                         ColumnDef {
                             col_name: "name".to_owned(),
                             col_type: Some(TypeName {
-                                ty: TypeDef::Varchar,
+                                name: "varchar".to_owned(),
                                 size: Some(TypeSize::MaxSize("255".to_owned())),
                             }),
                             constraints: vec![
@@ -52,7 +52,7 @@ test_parse!(
                         ColumnDef {
                             col_name: "age".to_owned(),
                             col_type: Some(TypeName {
-                                ty: TypeDef::Integer,
+                                name: "int".to_owned(),
                                 size: None,
                             }),
                             constraints: vec![
@@ -133,7 +133,7 @@ test_parse!(
                 action: AlterTableAction::AddColumn(ColumnDef {
                     col_name: "email".to_owned(),
                     col_type: Some(TypeName {
-                        ty: TypeDef::Integer,
+                        name: "int".to_owned(),
                         size: None,
                     }),
                     constraints: vec![],
@@ -164,7 +164,7 @@ test_parse!(
             if_not_exists: true,
             schema_index: SchemaObject {
                 schema_name: None,
-                name: "Index_eage".to_owned(),
+                name: "index_eage".to_owned(),
             },
             table_name: "employee".to_owned(),
             indexed_cols: vec![IndexedColumn {
@@ -186,7 +186,7 @@ test_parse!(
             if_exists: false,
             schema_index: SchemaObject {
                 schema_name: None,
-                name: "Index_eage".to_owned(),
+                name: "index_eage".to_owned(),
             },
         }
     ),]
@@ -203,7 +203,7 @@ test_parse!(
             if_not_exists: false,
             schema_view: SchemaObject {
                 schema_name: None,
-                name: "View_employee".to_owned(),
+                name: "view_employee".to_owned(),
             },
             columns: vec!["ename".to_owned(), "eage".to_owned()],
             select: Select {
@@ -254,7 +254,7 @@ test_parse!(
             if_exists: false,
             schema_view: SchemaObject {
                 schema_name: None,
-                name: "View_employee".to_owned(),
+                name: "view_employee".to_owned(),
             },
         }
     ),]
@@ -303,14 +303,14 @@ test_parse!(
         (
             "decimal(10, 2)",
             TypeName {
-                ty: TypeDef::Decimal,
+                name: "decimal".to_owned(),
                 size: Some(TypeSize::TypeSize("10".to_owned(), "2".to_owned())),
             }
         ),
         (
             "varchar(255)",
             TypeName {
-                ty: TypeDef::Varchar,
+                name: "varchar".to_owned(),
                 size: Some(TypeSize::MaxSize("255".to_owned())),
             }
         ),
@@ -385,7 +385,7 @@ test_parse!(
             ColumnDef {
                 col_name: "name".to_owned(),
                 col_type: Some(TypeName {
-                    ty: TypeDef::Varchar,
+                    name: "varchar".to_owned(),
                     size: Some(TypeSize::MaxSize("255".to_owned())),
                 }),
                 constraints: vec![
@@ -405,7 +405,7 @@ test_parse!(
             ColumnDef {
                 col_name: "name".to_owned(),
                 col_type: Some(TypeName {
-                    ty: TypeDef::Integer,
+                    name: "int".to_owned(),
                     size: None,
                 }),
                 constraints: vec![],
@@ -460,7 +460,7 @@ test_parse!(
                 columns: vec![ColumnDef {
                     col_name: "id".to_owned(),
                     col_type: Some(TypeName {
-                        ty: TypeDef::Integer,
+                        name: "integer".to_owned(),
                         size: None,
                     }),
                     constraints: vec![],
@@ -524,7 +524,7 @@ test_parse!(
                     BinaryOp::Eq,
                     Box::new(Expr::QualifiedColumn(
                         None,
-                        Some("NEW".to_owned()),
+                        Some("new".to_owned()),
                         "id".to_owned(),
                     )),
                 )),

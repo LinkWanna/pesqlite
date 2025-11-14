@@ -210,16 +210,10 @@ impl Parser for IndexedColumn {
 impl Parser for TypeName {
     fn parse(pair: Pair<Rule>) -> Self {
         let mut inner = pair.into_inner();
-        let type_part = inner.next().unwrap();
+        let pair = inner.next().unwrap();
 
-        let ty = match type_part.as_rule() {
-            Rule::type_decimal => TypeDef::Decimal,
-            Rule::type_double => TypeDef::Double,
-            Rule::type_int => TypeDef::Integer,
-            Rule::type_string => TypeDef::String,
-            Rule::type_varchar => TypeDef::Varchar,
-            rule => panic!("Unexpected rule: {:?}", rule),
-        };
+        println!("{:?}", pair);
+        let name = String::parse(pair);
 
         let size = match (inner.next(), inner.next()) {
             (Some(first), Some(second)) => Some(TypeSize::TypeSize(
@@ -229,7 +223,8 @@ impl Parser for TypeName {
             (Some(first), None) => Some(TypeSize::MaxSize(first.as_str().to_owned())),
             _ => None,
         };
-        Self { ty, size }
+
+        Self { name, size }
     }
 }
 
