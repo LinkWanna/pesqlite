@@ -1,7 +1,7 @@
 mod common;
 
 use common::test_parse;
-use sqlite_pest::*;
+use pesqlite::*;
 
 test_parse!(
     test_create_table,

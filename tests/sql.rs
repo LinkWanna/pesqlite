@@ -1,5 +1,5 @@
 mod common;
-use sqlite_pest::*;
+use pesqlite::*;
 
 #[test]
 fn test_sql_samples() {

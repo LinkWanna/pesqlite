@@ -1,7 +1,7 @@
 mod common;
 
 use common::test_parse;
-use sqlite_pest::{Parser, *};
+use pesqlite::{Parser, *};
 
 test_parse!(
     test_begin,
