@@ -118,7 +118,7 @@ test_parse!(
     Select::parse,
     [
         (
-            r"SELECT id, name FROM sql.users
+            r"SELECT id, name FROM sql.users as u
             WHERE age > 30
             group by age
             having age > 20
@@ -142,7 +142,7 @@ test_parse!(
                             schema_name: Some("sql".to_owned()),
                             name: "users".to_owned(),
                         },
-                        alias: None,
+                        alias: Some("u".to_owned()),
                         indexed: None,
                     }])),
                     where_clause: Some(Expr::Binary(

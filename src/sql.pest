@@ -21,12 +21,12 @@ drop_index     =  { ^"DROP" ~ ^"INDEX" ~ if_exists? ~ schema_object }
 drop_trigger   =  { ^"DROP" ~ ^"TRIGGER" ~ if_exists? ~ schema_object }
 
 // TCL 语句
-tcl      = _{ begin | commit | rollback | save | release }
-begin    =  { ^"BEGIN" ~ transaction_type? ~ ^"TRANSACTION"? }
-commit   =  { (^"COMMIT" | ^"END") ~ ^"TRANSACTION"? }
-rollback =  { ^"ROLLBACK" ~ ^"TRANSACTION"? ~ (^"TO" ~ ^"SAVEPOINT"? ~ ident)? }
-save     =  { ^"SAVEPOINT" ~ ident }
-release  =  { ^"RELEASE" ~ ^"SAVEPOINT"? ~ ident }
+tcl       = _{ begin | commit | rollback | savepoint | release }
+begin     =  { ^"BEGIN" ~ transaction_type? ~ ^"TRANSACTION"? }
+commit    =  { (^"COMMIT" | ^"END") ~ ^"TRANSACTION"? }
+rollback  =  { ^"ROLLBACK" ~ ^"TRANSACTION"? ~ (^"TO" ~ ^"SAVEPOINT "? ~ ident)? }
+savepoint =  { ^"SAVEPOINT" ~ ident }
+release   =  { ^"RELEASE" ~ ^"SAVEPOINT"? ~ ident }
 
 /* -------------------------- 语义封装 -------------------------- */
 schema_object   = { (ident ~ ".")? ~ ident }
