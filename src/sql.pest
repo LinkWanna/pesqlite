@@ -1,5 +1,14 @@
-stmts = _{ SOI ~ stmt+ ~ EOI }
-stmt  =  { (dml | ddl | tcl) ~ ";" }
+// 对外接口
+stmts_end          = _{ SOI ~ stmts ~ EOI }
+stmt_end           = _{ SOI ~ stmt ~ EOI }
+create_table_end   = _{ SOI ~ create_table ~ EOI }
+create_view_end    = _{ SOI ~ create_view ~ EOI }
+create_index_end   = _{ SOI ~ create_index ~ EOI }
+create_trigger_end = _{ SOI ~ create_trigger ~ EOI }
+
+// 语句
+stmts = _{ stmt ~ (";" ~ stmt)* }
+stmt  =  { dml | ddl | tcl }
 
 // DML 语句
 dml    = _{ select | insert | update | delete }
@@ -333,10 +342,10 @@ keyword      =  {
   | ^"CONSTRAINT"
   | ^"CREATE"
   | ^"CROSS"
-  | ^"CURRENT_DATE"
-  | ^"CURRENT_TIME"
-  | ^"CURRENT_TIMESTAMP"
   | ^"CURRENT"
+  | ^"CURRENT_DATE"
+  | ^"CURRENT_TIMESTAMP"
+  | ^"CURRENT_TIME"
   | ^"DATABASE"
   | ^"DEFAULT"
   | ^"DEFERRABLE"
