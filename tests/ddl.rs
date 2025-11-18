@@ -289,7 +289,7 @@ test_parse!(
             "default 0.",
             ColumnConstraint {
                 name: None,
-                ty: ColumnConstraintType::Default(Literal::Decimal("0.".to_owned()))
+                ty: ColumnConstraintType::Default(Expr::Literal(Literal::Decimal("0.".to_owned())))
             }
         ),
     ]
@@ -422,6 +422,26 @@ test_parse!(
                 }],
             }
         ),
+        (
+            "id integer references users(id)",
+            ColumnDef {
+                col_name: "id".to_owned(),
+                col_type: Some(TypeName {
+                    name: "integer".to_owned(),
+                    size: None,
+                }),
+                constraints: vec![ColumnConstraint {
+                    name: None,
+                    ty: ColumnConstraintType::ForeignKey(ForeignKey {
+                        schema_table: SchemaObject {
+                            schema_name: None,
+                            name: "users".to_owned(),
+                        },
+                        cols: vec!["id".to_owned()],
+                    }),
+                }],
+            }
+        ),
     ]
 );
 
@@ -546,6 +566,22 @@ test_parse!(
                 schema_name: None,
                 name: "update_employee_age".to_owned(),
             },
+        }
+    ),]
+);
+
+test_parse!(
+    test_foreign_key,
+    Rule::foreign_key,
+    ForeignKey::parse,
+    [(
+        "REFERENCES employee(id)",
+        ForeignKey {
+            schema_table: SchemaObject {
+                schema_name: None,
+                name: "employee".to_owned(),
+            },
+            cols: vec!["id".to_owned()],
         }
     ),]
 );

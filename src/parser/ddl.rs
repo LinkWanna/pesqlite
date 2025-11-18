@@ -133,8 +133,13 @@ impl Parser for ColumnConstraint {
                 ColumnConstraintType::Check(Expr::parse(expr_pair))
             }
             Rule::column_constraint5 => {
-                let literal_pair = pair.into_inner().next().unwrap();
-                ColumnConstraintType::Default(Literal::parse(literal_pair))
+                let pair = pair.into_inner().next().unwrap();
+                ColumnConstraintType::Default(Expr::parse(pair))
+            }
+            Rule::column_constraint6 => {
+                let pair = pair.into_inner().next().unwrap();
+                let foreign_key = ForeignKey::parse(pair);
+                ColumnConstraintType::ForeignKey(foreign_key)
             }
             rule => panic!("Unexpected rule: {:?}", rule),
         };
@@ -511,5 +516,23 @@ impl Parser for DropTrigger {
             if_exists,
             schema_trigger,
         }
+    }
+}
+
+impl Parser for ForeignKey {
+    fn parse(pair: Pair<Rule>) -> Self {
+        let mut inner = pair.into_inner();
+        let pair = inner.next().unwrap();
+
+        // 解析引用的表名
+        let schema_table = SchemaObject::parse(pair);
+        let pair = inner.next();
+
+        // 解析引用的列名（可选）
+        let cols = pair.map_or(vec![], |p| {
+            p.into_inner().map(|p| String::parse(p)).collect()
+        });
+
+        Self { schema_table, cols }
     }
 }

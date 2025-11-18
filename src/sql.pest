@@ -165,15 +165,19 @@ column_def  = { ident ~ type_name? ~ column_constraints }
 
 // 列级约束
 column_constraints = { column_constraint* }
-column_constraint  = { (^"CONSTRAINT" ~ ident)? ~ (column_constraint1 | column_constraint2 | column_constraint3 | column_constraint4 | column_constraint5) }
+column_constraint  = { (^"CONSTRAINT" ~ ident)? ~ (column_constraint1 | column_constraint2 | column_constraint3 | column_constraint4 | column_constraint5 | column_constraint6) }
 column_constraint1 = { ^"PRIMARY" ~ ^"KEY" ~ order? ~ conflict_clause? ~ auto_increment? }
 column_constraint2 = { ^"NOT" ~ ^"NULL" ~ conflict_clause? }
 column_constraint3 = { ^"UNIQUE" ~ conflict_clause? }
 column_constraint4 = { ^"CHECK" ~ "(" ~ expr ~ ")" }
-column_constraint5 = { ^"DEFAULT" ~ literal }
+column_constraint5 = { ^"DEFAULT" ~ (("(" ~ expr ~ ")") | expr) }
+column_constraint6 = { foreign_key }
 
 // 约束冲突
 conflict_clause = { ^"ON" ~ ^"CONFLICT" ~ conflict_resolution }
+
+// 外键约束
+foreign_key = { ^"REFERENCES" ~ schema_object ~ ("(" ~ idents ~ ")")? }
 
 /* -------------------------- create table -------------------------- */
 

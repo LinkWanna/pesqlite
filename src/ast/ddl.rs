@@ -1,6 +1,6 @@
 //! 数据定义语言（Data Definition Language, DDL）相关的抽象语法树定义
 
-use crate::{Dml, Expr, Literal, SchemaObject, Select};
+use crate::{Dml, Expr, SchemaObject, Select};
 
 /// 建表语句
 #[derive(Clone, Debug, PartialEq)]
@@ -73,8 +73,8 @@ pub struct DropView {
     pub schema_view: SchemaObject,
 }
 
-#[derive(Clone, Debug, PartialEq)]
 /// 触发器删除语句
+#[derive(Clone, Debug, PartialEq)]
 pub struct DropTrigger {
     pub if_exists: bool,
     pub schema_trigger: SchemaObject,
@@ -120,11 +120,21 @@ pub struct ColumnConstraint {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum ColumnConstraintType {
-    PrimaryKey { asc: bool, auto_inc: bool }, // 默认升序
+    PrimaryKey {
+        asc: bool, // 默认升序
+        auto_inc: bool,
+    },
     NotNull,
     Unique,
     Check(Expr),
-    Default(Literal),
+    Default(Expr),
+    ForeignKey(ForeignKey),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct ForeignKey {
+    pub schema_table: SchemaObject,
+    pub cols: Vec<String>,
 }
 
 /// 表级约束
