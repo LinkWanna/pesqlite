@@ -6,13 +6,13 @@ fn test_sql_samples() {
     use pest::Parser;
 
     let samples = [
-        "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255));",
-        "INSERT INTO users (id, name) VALUES (1, 'Alice');",
-        "SELECT * FROM users WHERE id = 1;",
-        "UPDATE users SET name = 'Bob' WHERE id = 1;",
-        "DELETE FROM users WHERE id = 1;",
-        "CREATE INDEX idx_name ON users (name);",
-        "DROP TABLE users;",
+        "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(255))",
+        "INSERT INTO users (id, name) VALUES (1, 'Alice')",
+        "SELECT * FROM users WHERE id = 1",
+        "UPDATE users SET name = 'Bob' WHERE id = 1",
+        "DELETE FROM users WHERE id = 1",
+        "CREATE INDEX idx_name ON users (name)",
+        "DROP TABLE users",
     ];
 
     for sample in samples {

@@ -160,6 +160,9 @@ impl Parser for Literal {
             Rule::null => Self::Null,
             Rule::r#true => Self::Bool(true),
             Rule::r#false => Self::Bool(false),
+            Rule::current_time => Self::CurrentTime,
+            Rule::current_date => Self::CurrentDate,
+            Rule::current_timestamp => Self::CurrentTimestamp,
             rule => panic!("Unexpected rule: {:?}", rule),
         }
     }

@@ -7,7 +7,7 @@ create_index_end   = _{ SOI ~ create_index ~ EOI }
 create_trigger_end = _{ SOI ~ create_trigger ~ EOI }
 
 // 语句
-stmts = _{ stmt ~ (";" ~ stmt)* }
+stmts = _{ stmt ~ (";" ~ stmt)* ~ ";"? }
 stmt  =  { dml | ddl | tcl }
 
 // DML 语句
@@ -228,7 +228,7 @@ exclusive        =  { ^"EXCLUSIVE" }
 /* -------------------------- 词法定义 -------------------------- */
 
 /// 字面量
-literal =  { true | false | null | double | decimal | integer | string | blob }
+literal =  { true | false | null | double | decimal | integer | string | blob | current_timestamp | current_time | current_date }
 true    =  { ^"TRUE" }
 false   =  { ^"FALSE" }
 null    =  { ^"NULL" }
@@ -237,6 +237,10 @@ decimal = @{ integer? ~ ("." ~ ASCII_DIGIT*) }
 integer = @{ ("+" | "-")? ~ ASCII_DIGIT+ }
 string  = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
 blob    = @{ ^"X" ~ "'" ~ (ASCII_HEX_DIGIT)* ~ "'" }
+
+current_time      = { ^"CURRENT_TIME" }
+current_date      = { ^"CURRENT_DATE" }
+current_timestamp = { ^"CURRENT_TIMESTAMP" }
 
 /// 数据类型
 type_name = { ident ~ ("(" ~ unsigned ~ ("," ~ unsigned)? ~ ")")? }

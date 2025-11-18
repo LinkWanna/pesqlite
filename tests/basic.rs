@@ -58,6 +58,17 @@ test_parse!(
 );
 
 test_parse!(
+    test_literal_time,
+    Rule::literal,
+    Literal::parse,
+    [
+        ("Current_time", Literal::CurrentTime),
+        ("Current_date", Literal::CurrentDate),
+        ("Current_timestamp", Literal::CurrentTimestamp),
+    ]
+);
+
+test_parse!(
     test_expr_accuracy,
     Rule::expr,
     Expr::parse,
