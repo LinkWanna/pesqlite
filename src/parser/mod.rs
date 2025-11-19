@@ -49,7 +49,11 @@ lazy_static::lazy_static! {
             // NOT
             .op(Op::prefix(logical_not))
             // IS, IS NOT
-            .op(Op::infix(is_not, Left) | Op::infix(is, Left))
+            .op(
+                Op::infix(is_not, Left) | Op::infix(is, Left) |
+                Op::postfix(between) | Op::postfix(in_op) | Op::postfix(match_op) | Op::postfix(like) | Op::postfix(regexp) | Op::postfix(glob) |
+                Op::postfix(is_null) |  Op::postfix(not_null)
+            )
             // =, !=
             .op(Op::infix(eq, Left) | Op::infix(ne, Left))
             // <, <=, >, >=
@@ -121,7 +125,7 @@ impl Parser for Expr {
                     Rule::is_not => BinaryOp::IsNot,
                     Rule::logical_and => BinaryOp::LogicalAnd,
                     Rule::logical_or => BinaryOp::LogicalOr,
-                    rule => unreachable!("Expr::parse expected infix operation, found {:?}", rule),
+                    rule => unreachable!("Expr::parse expected infix oprator, found {:?}", rule),
                 };
 
                 Self::Binary(Box::new(lhs), op, Box::new(rhs))
@@ -132,9 +136,84 @@ impl Parser for Expr {
                     Rule::positive => UnaryOp::Positive,
                     Rule::bitwise_not => UnaryOp::BitwiseNot,
                     Rule::logical_not => UnaryOp::LogicalNot,
-                    rule => unreachable!("Expr::parse expected prefix operation, found {:?}", rule),
+                    rule => unreachable!("Expr::parse expected prefix oprator, found {:?}", rule),
                 };
                 Self::Unary(op, Box::new(rhs))
+            })
+            .map_postfix(|lhs, op| {
+                let rule = match op.as_rule() {
+                    Rule::is_null => return Self::NullJudge(Box::new(lhs), true),
+                    Rule::not_null => return Self::NullJudge(Box::new(lhs), false),
+                    rule => rule,
+                };
+
+                let mut inner = op.into_inner();
+                let pair = inner.next().unwrap();
+
+                // 解析 not（可选）
+                let (not, pair) = match pair.as_rule() {
+                    Rule::logical_not => (true, inner.next().unwrap()),
+                    _ => (false, pair),
+                };
+
+                match rule {
+                    Rule::between => {
+                        let low = Expr::parse(pair);
+                        let high = Expr::parse(inner.next().unwrap());
+                        Self::Between {
+                            expr: Box::new(lhs),
+                            not,
+                            low: Box::new(low),
+                            high: Box::new(high),
+                        }
+                    }
+                    Rule::in_op => {
+                        // 解析表达式列表
+                        let list = pair.into_inner().map(Expr::parse).collect::<Vec<Expr>>();
+                        Self::In {
+                            expr: Box::new(lhs),
+                            not,
+                            list,
+                        }
+                    }
+                    Rule::match_op => {
+                        let pattern = Expr::parse(pair);
+                        Self::Match {
+                            expr: Box::new(lhs),
+                            not,
+                            pattern: Box::new(pattern),
+                        }
+                    }
+                    Rule::like => {
+                        let pattern = Expr::parse(pair);
+
+                        // 解析 escape（可选）
+                        let escape = inner.next().map(Expr::parse).map(Box::new);
+                        Self::Like {
+                            expr: Box::new(lhs),
+                            not,
+                            pattern: Box::new(pattern),
+                            escape,
+                        }
+                    }
+                    Rule::regexp => {
+                        let pattern = Expr::parse(pair);
+                        Self::Regexp {
+                            expr: Box::new(lhs),
+                            not,
+                            pattern: Box::new(pattern),
+                        }
+                    }
+                    Rule::glob => {
+                        let pattern = Expr::parse(pair);
+                        Self::Glob {
+                            expr: Box::new(lhs),
+                            not,
+                            pattern: Box::new(pattern),
+                        }
+                    }
+                    rule => unreachable!("Expr::parse expected postfix oprator, found {:?}", rule),
+                }
             })
             .parse(pairs)
     }

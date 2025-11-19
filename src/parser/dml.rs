@@ -15,8 +15,6 @@ impl Parser for Select {
         loop {
             match pair {
                 Some(p) if p.as_rule() == Rule::compound_operator => {
-                    println!("P: {:?}", p);
-
                     // 解析复合操作符
                     let inside = p.into_inner().next().unwrap();
                     let operator = match inside.as_rule() {

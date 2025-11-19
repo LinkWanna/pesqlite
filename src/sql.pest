@@ -250,20 +250,21 @@ current_timestamp = { ^"CURRENT_TIMESTAMP" }
 type_name = { ident ~ ("(" ~ unsigned ~ ("," ~ unsigned)? ~ ")")? }
 
 /// 表达式
-expr  = { prefix? ~ primary ~ (infix ~ prefix? ~ primary)* }
+expr  = { prefix* ~ primary ~ postfix? ~ (infix ~ prefix* ~ primary ~ postfix?)* }
 exprs = { expr ~ ("," ~ expr)* }
 
 primary   = _{ literal | qualified_column | expr_list }
 expr_list = _{ "(" ~ exprs ~ ")" }
 
-// 一元运算符
+// 前缀运算符
+prefix_expr =  { prefix? ~ primary }
 prefix      = _{ logical_not | bitwise_not | positive | negative }
 bitwise_not =  { "~" }
 positive    =  { "+" }
 negative    =  { "-" }
 logical_not =  { ^"NOT" }
 
-// 二元运算符
+// 中缀运算符
 infix       = _{
     logical_or
   | logical_and
@@ -306,6 +307,17 @@ is_not      =  { ^"IS" ~ ^"NOT " }
 is          =  { ^"IS " }
 logical_and =  { ^"AND " }
 logical_or  =  { ^"OR " }
+
+// 后缀运算符
+postfix  = _{ between | in_op | regexp | match_op | like | glob | is_null | not_null }
+between  =  { logical_not? ~ ^"BETWEEN" ~ prefix_expr ~ ^"AND" ~ prefix_expr }
+in_op    =  { logical_not? ~ ^"IN" ~ expr_list }
+match_op =  { logical_not? ~ ^"MATCH" ~ expr }
+like     =  { logical_not? ~ ^"LIKE" ~ expr ~ (^"ESCAPE" ~ expr)? }
+regexp   =  { logical_not? ~ ^"REGEXP" ~ expr }
+glob     =  { logical_not? ~ ^"GLOB" ~ expr }
+is_null  =  { ^"ISNULL" }
+not_null =  { ^"NOTNULL" | (^"NOT" ~ ^"NULL") }
 
 // 基础词法
 natural        = { ^"NATURAL" }

@@ -217,9 +217,10 @@ impl Parser for TypeName {
         let mut inner = pair.into_inner();
         let pair = inner.next().unwrap();
 
-        println!("{:?}", pair);
+        // 解析类型名称
         let name = String::parse(pair);
 
+        // 解析类型大小（可选）
         let size = match (inner.next(), inner.next()) {
             (Some(first), Some(second)) => Some(TypeSize::TypeSize(
                 first.as_str().to_owned(),

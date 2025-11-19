@@ -44,17 +44,44 @@ pub enum Literal {
 /// 表达式
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
-    Literal(Literal),                       // 字面量
-    Unary(UnaryOp, Box<Expr>),              // 一元运算
-    Binary(Box<Expr>, BinaryOp, Box<Expr>), // 二元运算
-    ExprList(Vec<Expr>),                    // 表达式列表
+    Literal(Literal),                                        // 字面量
+    ExprList(Vec<Expr>),                                     // 表达式列表
+    Unary(UnaryOp, Box<Expr>),                               // 一元运算
+    Binary(Box<Expr>, BinaryOp, Box<Expr>),                  // 二元运算
+    QualifiedColumn(Option<String>, Option<String>, String), // 限定名称
+    NullJudge(Box<Expr>, bool),
     Between {
         expr: Box<Expr>,
         not: bool,
         low: Box<Expr>,
         high: Box<Expr>,
     }, // BETWEEN 表达式
-    QualifiedColumn(Option<String>, Option<String>, String), // 限定名称
+    In {
+        expr: Box<Expr>,
+        not: bool,
+        list: Vec<Expr>,
+    }, // IN 列表表达式
+    Match {
+        expr: Box<Expr>,
+        not: bool,
+        pattern: Box<Expr>,
+    }, // MATCH 表达式
+    Like {
+        expr: Box<Expr>,
+        not: bool,
+        pattern: Box<Expr>,
+        escape: Option<Box<Expr>>,
+    }, // LIKE 表达式
+    Regexp {
+        expr: Box<Expr>,
+        not: bool,
+        pattern: Box<Expr>,
+    }, // REGEXP 表达式
+    Glob {
+        expr: Box<Expr>,
+        not: bool,
+        pattern: Box<Expr>,
+    }, // GLOB 表达式}
 }
 
 /// 二元运算符
