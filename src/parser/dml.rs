@@ -85,7 +85,7 @@ impl Parser for SelectCore {
                 };
 
                 // 解析结果列
-                let columns: Vec<_> = pair
+                let cols: Vec<_> = pair
                     .into_inner()
                     .map(|col_pair| ResultColumn::parse(col_pair))
                     .collect();
@@ -124,7 +124,7 @@ impl Parser for SelectCore {
 
                 Self::Query {
                     is_distinct,
-                    columns,
+                    cols,
                     from_clause,
                     where_clause,
                     group_by,
@@ -182,7 +182,7 @@ impl Parser for Insert {
         };
 
         // 解析列名列表（可选）
-        let (columns, pair) = match pair.as_rule() {
+        let (cols, pair) = match pair.as_rule() {
             Rule::idents => {
                 let cols: Vec<_> = pair
                     .into_inner()
@@ -251,7 +251,7 @@ impl Parser for Insert {
             header,
             schema_table,
             alias,
-            columns,
+            cols,
             values,
             return_clause,
         }
@@ -438,7 +438,7 @@ impl Parser for SetSubClause {
         let pair = inner.next().unwrap();
 
         // 解析列名列表
-        let (columns, pair) = match pair.as_rule() {
+        let (cols, pair) = match pair.as_rule() {
             Rule::idents => {
                 let cols: Vec<_> = pair
                     .into_inner()
@@ -453,7 +453,7 @@ impl Parser for SetSubClause {
         // 解析赋值表达式
         let value = Expr::parse(pair);
 
-        Self { columns, value }
+        Self { cols, value }
     }
 }
 

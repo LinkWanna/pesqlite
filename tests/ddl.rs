@@ -23,9 +23,9 @@ test_parse!(
                     name: "users".to_owned(),
                 },
                 body: CreateTableBody::Columns {
-                    columns: vec![
+                    cols: vec![
                         ColumnDef {
-                            col_name: "id".to_owned(),
+                            name: "id".to_owned(),
                             col_type: Some(TypeName {
                                 name: "integer".to_owned(),
                                 size: None,
@@ -33,7 +33,7 @@ test_parse!(
                             constraints: vec![],
                         },
                         ColumnDef {
-                            col_name: "name".to_owned(),
+                            name: "name".to_owned(),
                             col_type: Some(TypeName {
                                 name: "varchar".to_owned(),
                                 size: Some(TypeSize::MaxSize("255".to_owned())),
@@ -50,7 +50,7 @@ test_parse!(
                             ],
                         },
                         ColumnDef {
-                            col_name: "age".to_owned(),
+                            name: "age".to_owned(),
                             col_type: Some(TypeName {
                                 name: "int".to_owned(),
                                 size: None,
@@ -67,7 +67,7 @@ test_parse!(
                             ],
                         },
                     ],
-                    table_constraints: vec![TableConstraint {
+                    constraints: vec![TableConstraint {
                         name: Some("pk".to_owned()),
                         cols: vec![IndexedColumn {
                             name: "id".to_owned(),
@@ -75,7 +75,7 @@ test_parse!(
                         }],
                         ty: TableConstraintType::PrimaryKey,
                     },],
-                    table_options: vec![],
+                    options: vec![],
                 }
             }
         ),
@@ -89,13 +89,13 @@ test_parse!(
                     name: "x".to_owned(),
                 },
                 body: CreateTableBody::Columns {
-                    columns: vec![ColumnDef {
-                        col_name: "id".to_owned(),
+                    cols: vec![ColumnDef {
+                        name: "id".to_owned(),
                         col_type: None,
                         constraints: vec![],
                     }],
-                    table_constraints: vec![],
-                    table_options: vec![],
+                    constraints: vec![],
+                    options: vec![],
                 }
             }
         ),
@@ -131,7 +131,7 @@ test_parse!(
                     name: "employee".to_owned(),
                 },
                 action: AlterTableAction::AddColumn(ColumnDef {
-                    col_name: "email".to_owned(),
+                    name: "email".to_owned(),
                     col_type: Some(TypeName {
                         name: "int".to_owned(),
                         size: None,
@@ -205,11 +205,11 @@ test_parse!(
                 schema_name: None,
                 name: "view_employee".to_owned(),
             },
-            columns: vec!["ename".to_owned(), "eage".to_owned()],
+            cols: vec!["ename".to_owned(), "eage".to_owned()],
             select: Select {
                 core: SelectCore::Query {
                     is_distinct: false,
-                    columns: vec![
+                    cols: vec![
                         ResultColumn::Expr(
                             Expr::QualifiedColumn(None, None, "ename".to_owned()),
                             None
@@ -383,7 +383,7 @@ test_parse!(
         (
             "name varchar(255) unique not null",
             ColumnDef {
-                col_name: "name".to_owned(),
+                name: "name".to_owned(),
                 col_type: Some(TypeName {
                     name: "varchar".to_owned(),
                     size: Some(TypeSize::MaxSize("255".to_owned())),
@@ -403,7 +403,7 @@ test_parse!(
         (
             "name int",
             ColumnDef {
-                col_name: "name".to_owned(),
+                name: "name".to_owned(),
                 col_type: Some(TypeName {
                     name: "int".to_owned(),
                     size: None,
@@ -414,7 +414,7 @@ test_parse!(
         (
             "name not null",
             ColumnDef {
-                col_name: "name".to_owned(),
+                name: "name".to_owned(),
                 col_type: None,
                 constraints: vec![ColumnConstraint {
                     name: None,
@@ -425,7 +425,7 @@ test_parse!(
         (
             "id integer references users(id)",
             ColumnDef {
-                col_name: "id".to_owned(),
+                name: "id".to_owned(),
                 col_type: Some(TypeName {
                     name: "integer".to_owned(),
                     size: None,
@@ -455,7 +455,7 @@ test_parse!(
             CreateTableBody::Select(Select {
                 core: SelectCore::Query {
                     is_distinct: false,
-                    columns: vec![ResultColumn::Star],
+                    cols: vec![ResultColumn::Star],
                     from_clause: Some(FromClause::TableOrQuerys(vec![QualifiedTable {
                         schema_table: SchemaObject {
                             schema_name: None,
@@ -477,15 +477,15 @@ test_parse!(
         (
             "(id integer, unique (name) on conflict rollback) strict",
             CreateTableBody::Columns {
-                columns: vec![ColumnDef {
-                    col_name: "id".to_owned(),
+                cols: vec![ColumnDef {
+                    name: "id".to_owned(),
                     col_type: Some(TypeName {
                         name: "integer".to_owned(),
                         size: None,
                     }),
                     constraints: vec![],
                 },],
-                table_constraints: vec![TableConstraint {
+                constraints: vec![TableConstraint {
                     name: None,
                     cols: vec![IndexedColumn {
                         name: "name".to_owned(),
@@ -493,7 +493,7 @@ test_parse!(
                     }],
                     ty: TableConstraintType::Unique,
                 },],
-                table_options: vec![TableOption::Strict]
+                options: vec![TableOption::Strict]
             }
         ),
     ]
@@ -531,7 +531,7 @@ test_parse!(
                     indexed: None
                 },
                 set_clause: vec![SetSubClause {
-                    columns: vec!["age".to_owned()],
+                    cols: vec!["age".to_owned()],
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "age".to_owned())),
                         BinaryOp::Plus,

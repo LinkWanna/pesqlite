@@ -28,7 +28,7 @@ pub struct CreateView {
     pub temp: bool,
     pub if_not_exists: bool,
     pub schema_view: SchemaObject,
-    pub columns: Vec<String>,
+    pub cols: Vec<String>,
     pub select: Select,
 }
 
@@ -92,7 +92,7 @@ pub enum AlterTableAction {
 /// 列定义
 #[derive(Clone, Debug, PartialEq)]
 pub struct ColumnDef {
-    pub col_name: String,
+    pub name: String,
     pub col_type: Option<TypeName>,
     pub constraints: Vec<ColumnConstraint>,
 }
@@ -162,9 +162,9 @@ pub struct IndexedColumn {
 pub enum CreateTableBody {
     Select(Select),
     Columns {
-        columns: Vec<ColumnDef>,
-        table_constraints: Vec<TableConstraint>,
-        table_options: Vec<TableOption>,
+        cols: Vec<ColumnDef>,
+        constraints: Vec<TableConstraint>,
+        options: Vec<TableOption>,
     },
 }
 

@@ -88,7 +88,7 @@ test_parse!(
             "SELECT id, name FROM sql.users WHERE age > 30",
             SelectCore::Query {
                 is_distinct: false,
-                columns: vec![
+                cols: vec![
                     ResultColumn::Expr(Expr::QualifiedColumn(None, None, "id".to_owned()), None),
                     ResultColumn::Expr(Expr::QualifiedColumn(None, None, "name".to_owned()), None),
                 ],
@@ -127,7 +127,7 @@ test_parse!(
             Select {
                 core: SelectCore::Query {
                     is_distinct: false,
-                    columns: vec![
+                    cols: vec![
                         ResultColumn::Expr(
                             Expr::QualifiedColumn(None, None, "id".to_owned()),
                             None
@@ -174,7 +174,7 @@ test_parse!(
             Select {
                 core: SelectCore::Query {
                     is_distinct: false,
-                    columns: vec![
+                    cols: vec![
                         ResultColumn::Expr(
                             Expr::QualifiedColumn(None, None, "id".to_owned()),
                             None
@@ -200,7 +200,7 @@ test_parse!(
                     CompoundOperator::Union(true),
                     SelectCore::Query {
                         is_distinct: false,
-                        columns: vec![ResultColumn::Expr(
+                        cols: vec![ResultColumn::Expr(
                             Expr::QualifiedColumn(None, None, "age".to_owned()),
                             None,
                         )],
@@ -243,7 +243,7 @@ test_parse!(
                     name: "users".to_owned(),
                 },
                 alias: None,
-                columns: vec!["id".to_owned(), "name".to_owned()],
+                cols: vec!["id".to_owned(), "name".to_owned()],
                 values: InsertValues::Values {
                     values: vec![
                         vec![
@@ -269,7 +269,7 @@ test_parse!(
                     name: "users".to_owned(),
                 },
                 alias: None,
-                columns: vec!["id".to_owned(), "name".to_owned()],
+                cols: vec!["id".to_owned(), "name".to_owned()],
                 values: InsertValues::Values {
                     values: vec![
                         vec![
@@ -300,14 +300,14 @@ test_parse!(
         (
             "name = 'Alice'",
             SetSubClause {
-                columns: vec!["name".to_owned()],
+                cols: vec!["name".to_owned()],
                 value: Expr::Literal(Literal::String("Alice".to_owned())),
             }
         ),
         (
             "(name, job) = ('Bob', 'Teacher')",
             SetSubClause {
-                columns: vec!["name".to_owned(), "job".to_owned()],
+                cols: vec!["name".to_owned(), "job".to_owned()],
                 value: Expr::ExprList(vec![
                     Expr::Literal(Literal::String("Bob".to_owned())),
                     Expr::Literal(Literal::String("Teacher".to_owned())),
@@ -435,7 +435,7 @@ test_parse!(
                     indexed: None
                 },
                 set_clause: vec![SetSubClause {
-                    columns: vec!["eage".to_owned()],
+                    cols: vec!["eage".to_owned()],
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "eage".to_owned())),
                         BinaryOp::Plus,
@@ -460,7 +460,7 @@ test_parse!(
                     indexed: None
                 },
                 set_clause: vec![SetSubClause {
-                    columns: vec!["eage".to_owned()],
+                    cols: vec!["eage".to_owned()],
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "eage".to_owned())),
                         BinaryOp::Plus,
@@ -590,7 +590,7 @@ test_parse!(
                 )),
                 upsert_type: UpsertType::Update {
                     set_clause: vec![SetSubClause {
-                        columns: vec!["name".to_owned()],
+                        cols: vec!["name".to_owned()],
                         value: Expr::Literal(Literal::String("Bob".to_owned())),
                     }],
                     where_clause: None

@@ -154,7 +154,7 @@ impl Parser for ColumnDef {
         let pair = inner.next().unwrap();
 
         // 解析列名
-        let col_name = String::parse(pair);
+        let name = String::parse(pair);
         let pair = inner.next();
 
         // 解析列类型（可选）
@@ -169,7 +169,7 @@ impl Parser for ColumnDef {
         });
 
         Self {
-            col_name,
+            name,
             col_type,
             constraints,
         }
@@ -256,7 +256,7 @@ impl Parser for CreateView {
         let pair = inner.next().unwrap();
 
         // 解析视图列（可选）
-        let (columns, pair) = match pair.as_rule() {
+        let (cols, pair) = match pair.as_rule() {
             Rule::idents => {
                 let cols: Vec<_> = pair.into_inner().map(|p| String::parse(p)).collect();
                 (cols, inner.next().unwrap())
@@ -271,7 +271,7 @@ impl Parser for CreateView {
             temp,
             if_not_exists,
             schema_view,
-            columns,
+            cols,
             select,
         }
     }
@@ -374,20 +374,20 @@ impl Parser for CreateTableBody {
             }
             Rule::column_defs => {
                 // 解析列定义
-                let columns = pair
+                let cols = pair
                     .into_inner()
                     .map(|p| ColumnDef::parse(p))
                     .collect::<Vec<_>>();
                 let pair = inner.next().unwrap();
 
                 // 解析表级约束（可选）
-                let table_constraints = pair
+                let constraints = pair
                     .into_inner()
                     .map(|p| TableConstraint::parse(p))
                     .collect();
 
                 // 解析表选项（可选）
-                let table_options: Vec<_> = inner
+                let options: Vec<_> = inner
                     .map(|p| match p.as_rule() {
                         Rule::without_rowid => TableOption::WithoutRowid,
                         Rule::strict => TableOption::Strict,
@@ -396,9 +396,9 @@ impl Parser for CreateTableBody {
                     .collect();
 
                 Self::Columns {
-                    columns,
-                    table_constraints,
-                    table_options,
+                    cols,
+                    constraints,
+                    options,
                 }
             }
             rule => unreachable!("Unexpected rule: {:?}", rule),

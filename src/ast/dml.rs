@@ -26,7 +26,7 @@ pub struct Insert {
     pub header: InsertHeader,
     pub schema_table: SchemaObject,
     pub alias: Option<String>,
-    pub columns: Vec<String>,
+    pub cols: Vec<String>,
     pub values: InsertValues,
     pub return_clause: Vec<ReturnSubClause>,
 }
@@ -55,7 +55,7 @@ pub struct Delete {
 pub enum SelectCore {
     Query {
         is_distinct: bool,
-        columns: Vec<ResultColumn>,
+        cols: Vec<ResultColumn>,
         from_clause: Option<FromClause>,
         where_clause: Option<Expr>,
         group_by: Vec<Expr>,
@@ -86,7 +86,7 @@ pub enum InsertValues {
 /// 赋值语句
 #[derive(Clone, Debug, PartialEq)]
 pub struct SetSubClause {
-    pub columns: Vec<String>,
+    pub cols: Vec<String>,
     pub value: Expr,
 }
 
