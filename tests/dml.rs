@@ -86,7 +86,7 @@ test_parse!(
         ),
         (
             "SELECT id, name FROM sql.users WHERE age > 30",
-            SelectCore::Query {
+            SelectCore::Query(Query {
                 is_distinct: false,
                 cols: vec![
                     ResultColumn::Expr(Expr::QualifiedColumn(None, None, "id".to_owned()), None),
@@ -107,7 +107,7 @@ test_parse!(
                 )),
                 group_by: vec![],
                 having: None
-            }
+            })
         )
     ]
 );
@@ -125,7 +125,7 @@ test_parse!(
             order by name
             limit 10 offset 5",
             Select {
-                core: SelectCore::Query {
+                core: SelectCore::Query(Query {
                     is_distinct: false,
                     cols: vec![
                         ResultColumn::Expr(
@@ -156,7 +156,7 @@ test_parse!(
                         BinaryOp::Gt,
                         Box::new(Expr::Literal(Literal::Integer("20".to_owned()))),
                     )),
-                },
+                }),
                 compound: vec![],
                 order_by: vec![OrderingTerm {
                     expr: Expr::QualifiedColumn(None, None, "name".to_owned()),
@@ -172,7 +172,7 @@ test_parse!(
             order by name
             limit 10 offset 5",
             Select {
-                core: SelectCore::Query {
+                core: SelectCore::Query(Query {
                     is_distinct: false,
                     cols: vec![
                         ResultColumn::Expr(
@@ -195,10 +195,10 @@ test_parse!(
                     where_clause: None,
                     group_by: vec![],
                     having: None,
-                },
+                }),
                 compound: vec![(
                     CompoundOperator::Union(true),
-                    SelectCore::Query {
+                    SelectCore::Query(Query {
                         is_distinct: false,
                         cols: vec![ResultColumn::Expr(
                             Expr::QualifiedColumn(None, None, "age".to_owned()),
@@ -215,7 +215,7 @@ test_parse!(
                         where_clause: None,
                         group_by: vec![],
                         having: None,
-                    }
+                    })
                 )],
                 order_by: vec![OrderingTerm {
                     expr: Expr::QualifiedColumn(None, None, "name".to_owned()),

@@ -53,15 +53,19 @@ pub struct Delete {
 /// Select 语句的核心部分
 #[derive(Clone, Debug, PartialEq)]
 pub enum SelectCore {
-    Query {
-        is_distinct: bool,
-        cols: Vec<ResultColumn>,
-        from_clause: Option<FromClause>,
-        where_clause: Option<Expr>,
-        group_by: Vec<Expr>,
-        having: Option<Expr>,
-    },
+    Query(Query),
     Values(Vec<Vec<Expr>>),
+}
+
+/// Query 语句
+#[derive(Clone, Debug, PartialEq)]
+pub struct Query {
+    pub is_distinct: bool,
+    pub cols: Vec<ResultColumn>,
+    pub from_clause: Option<FromClause>,
+    pub where_clause: Option<Expr>,
+    pub group_by: Vec<Expr>,
+    pub having: Option<Expr>,
 }
 
 #[derive(Clone, Debug, PartialEq)]

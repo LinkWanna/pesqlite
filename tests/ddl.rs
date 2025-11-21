@@ -207,7 +207,7 @@ test_parse!(
             },
             cols: vec!["ename".to_owned(), "eage".to_owned()],
             select: Select {
-                core: SelectCore::Query {
+                core: SelectCore::Query(Query {
                     is_distinct: false,
                     cols: vec![
                         ResultColumn::Expr(
@@ -234,7 +234,7 @@ test_parse!(
                     )),
                     group_by: vec![],
                     having: None
-                },
+                }),
                 compound: vec![],
                 order_by: vec![],
                 limit: None,
@@ -453,7 +453,7 @@ test_parse!(
         (
             "AS SELECT * FROM users",
             CreateTableBody::Select(Select {
-                core: SelectCore::Query {
+                core: SelectCore::Query(Query {
                     is_distinct: false,
                     cols: vec![ResultColumn::Star],
                     from_clause: Some(FromClause::TableOrQuerys(vec![QualifiedTable {
@@ -467,7 +467,7 @@ test_parse!(
                     where_clause: None,
                     group_by: vec![],
                     having: None,
-                },
+                }),
                 compound: vec![],
                 order_by: vec![],
                 limit: None,

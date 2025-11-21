@@ -122,14 +122,14 @@ impl Parser for SelectCore {
                 // 解析 HAVING 子句（可选）
                 let having = pair.map(|p| Expr::parse(p));
 
-                Self::Query {
+                Self::Query(Query {
                     is_distinct,
                     cols,
                     from_clause,
                     where_clause,
                     group_by,
                     having,
-                }
+                })
             }
             Rule::select_core2 => {
                 let mut inner = pair.into_inner();
