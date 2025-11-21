@@ -1,13 +1,13 @@
 // 对外接口
-stmts_end          = _{ SOI ~ stmts ~ EOI }
+stmts_end          = _{ SOI ~ stmts ~ ";"? ~ EOI }
 stmt_end           = _{ SOI ~ stmt ~ ";"? ~ EOI }
-create_table_end   = _{ SOI ~ create_table ~ EOI }
-create_view_end    = _{ SOI ~ create_view ~ EOI }
-create_index_end   = _{ SOI ~ create_index ~ EOI }
-create_trigger_end = _{ SOI ~ create_trigger ~ EOI }
+create_table_end   = _{ SOI ~ create_table ~ ";"? ~ EOI }
+create_view_end    = _{ SOI ~ create_view ~ ";"? ~ EOI }
+create_index_end   = _{ SOI ~ create_index ~ ";"? ~ EOI }
+create_trigger_end = _{ SOI ~ create_trigger ~ ";"? ~ EOI }
 
 // 语句
-stmts = _{ stmt ~ (";" ~ stmt)* ~ ";"? }
+stmts = _{ stmt ~ (";" ~ stmt)* }
 stmt  =  { dml | ddl | tcl }
 
 // DML 语句

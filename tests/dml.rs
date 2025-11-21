@@ -75,11 +75,11 @@ test_parse!(
             "VALUES (1, 'Alice'), (2, 'Bob')",
             SelectCore::Values(vec![
                 vec![
-                    Expr::Literal(Literal::Integer("1".to_owned())),
+                    Expr::Literal(Literal::Integer(1)),
                     Expr::Literal(Literal::String("Alice".to_owned())),
                 ],
                 vec![
-                    Expr::Literal(Literal::Integer("2".to_owned())),
+                    Expr::Literal(Literal::Integer(2)),
                     Expr::Literal(Literal::String("Bob".to_owned())),
                 ],
             ])
@@ -103,7 +103,7 @@ test_parse!(
                 where_clause: Some(Expr::Binary(
                     Box::new(Expr::QualifiedColumn(None, None, "age".to_owned())),
                     BinaryOp::Gt,
-                    Box::new(Expr::Literal(Literal::Integer("30".to_owned()))),
+                    Box::new(Expr::Literal(Literal::Integer(30))),
                 )),
                 group_by: vec![],
                 having: None
@@ -148,13 +148,13 @@ test_parse!(
                     where_clause: Some(Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "age".to_owned())),
                         BinaryOp::Gt,
-                        Box::new(Expr::Literal(Literal::Integer("30".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(30))),
                     )),
                     group_by: vec![Expr::QualifiedColumn(None, None, "age".to_owned())],
                     having: Some(Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "age".to_owned())),
                         BinaryOp::Gt,
-                        Box::new(Expr::Literal(Literal::Integer("20".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(20))),
                     )),
                 }),
                 compound: vec![],
@@ -163,8 +163,8 @@ test_parse!(
                     asc: true,
                     nulls_first: true,
                 }],
-                limit: Some(Expr::Literal(Literal::Integer("10".to_owned()))),
-                offset: Some(Expr::Literal(Literal::Integer("5".to_owned()))),
+                limit: Some(Expr::Literal(Literal::Integer(10))),
+                offset: Some(Expr::Literal(Literal::Integer(5))),
             }
         ),
         (
@@ -222,8 +222,8 @@ test_parse!(
                     asc: true,
                     nulls_first: true,
                 }],
-                limit: Some(Expr::Literal(Literal::Integer("10".to_owned()))),
-                offset: Some(Expr::Literal(Literal::Integer("5".to_owned()))),
+                limit: Some(Expr::Literal(Literal::Integer(10))),
+                offset: Some(Expr::Literal(Literal::Integer(5))),
             }
         )
     ]
@@ -247,11 +247,11 @@ test_parse!(
                 values: InsertValues::Values {
                     values: vec![
                         vec![
-                            Expr::Literal(Literal::Integer("1".to_owned())),
+                            Expr::Literal(Literal::Integer(1)),
                             Expr::Literal(Literal::String("Alice".to_owned())),
                         ],
                         vec![
-                            Expr::Literal(Literal::Integer("2".to_owned())),
+                            Expr::Literal(Literal::Integer(2)),
                             Expr::Literal(Literal::String("Bob".to_owned())),
                         ],
                     ],
@@ -273,11 +273,11 @@ test_parse!(
                 values: InsertValues::Values {
                     values: vec![
                         vec![
-                            Expr::Literal(Literal::Integer("1".to_owned())),
+                            Expr::Literal(Literal::Integer(1)),
                             Expr::Literal(Literal::String("Alice".to_owned())),
                         ],
                         vec![
-                            Expr::Literal(Literal::Integer("2".to_owned())),
+                            Expr::Literal(Literal::Integer(2)),
                             Expr::Literal(Literal::String("Bob".to_owned())),
                         ],
                     ],
@@ -439,7 +439,7 @@ test_parse!(
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "eage".to_owned())),
                         BinaryOp::Plus,
-                        Box::new(Expr::Literal(Literal::Integer("1".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(1))),
                     ),
                 }],
                 from_clause: None,
@@ -464,7 +464,7 @@ test_parse!(
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "eage".to_owned())),
                         BinaryOp::Plus,
-                        Box::new(Expr::Literal(Literal::Integer("1".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(1))),
                     ),
                 }],
                 from_clause: None,
@@ -494,7 +494,7 @@ test_parse!(
                 where_clause: Some(Expr::Binary(
                     Box::new(Expr::QualifiedColumn(None, None, "eid".to_owned())),
                     BinaryOp::Eq,
-                    Box::new(Expr::Literal(Literal::Integer("1001".to_owned()))),
+                    Box::new(Expr::Literal(Literal::Integer(1001))),
                 )),
                 return_clause: vec![],
             }
@@ -527,7 +527,7 @@ test_parse!(
             expr: Expr::Binary(
                 Box::new(Expr::QualifiedColumn(None, None, "eid".to_owned())),
                 BinaryOp::Plus,
-                Box::new(Expr::Literal(Literal::Integer("1001".to_owned()))),
+                Box::new(Expr::Literal(Literal::Integer(1001))),
             ),
             asc: false,
             nulls_first: false,

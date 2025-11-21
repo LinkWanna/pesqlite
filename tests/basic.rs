@@ -8,12 +8,12 @@ test_parse!(
     Rule::literal,
     Literal::parse,
     [
-        ("123e-1", Literal::Float("123e-1".to_owned())),
-        ("123e+2", Literal::Float("123e+2".to_owned())),
-        ("123.1e+2", Literal::Float("123.1e+2".to_owned())),
-        ("123.", Literal::Float("123.".to_owned())),
-        ("123.12", Literal::Float("123.12".to_owned())),
-        (".5", Literal::Float(".5".to_owned())),
+        ("123e-1", Literal::Float(123e-1)),
+        ("123e+2", Literal::Float(123e+2)),
+        ("123.1e+2", Literal::Float(123.1e+2)),
+        ("123.", Literal::Float(123.)),
+        ("123.12", Literal::Float(123.12)),
+        (".5", Literal::Float(0.5)),
     ]
 );
 
@@ -22,9 +22,9 @@ test_parse!(
     Rule::literal,
     Literal::parse,
     [
-        ("123", Literal::Integer("123".to_owned())),
-        ("0x123", Literal::Integer("0x123".to_owned())),
-        ("0X123", Literal::Integer("0X123".to_owned())),
+        ("123", Literal::Integer(123)),
+        ("0x123", Literal::Integer(0x123)),
+        ("0X123", Literal::Integer(0x123)),
     ]
 );
 
@@ -77,12 +77,12 @@ test_parse!(
         (
             "1 + 2 * 3",
             Expr::Binary(
-                Box::new(Expr::Literal(Literal::Integer("1".to_owned()))),
+                Box::new(Expr::Literal(Literal::Integer(1))),
                 BinaryOp::Plus,
                 Box::new(Expr::Binary(
-                    Box::new(Expr::Literal(Literal::Integer("2".to_owned()))),
+                    Box::new(Expr::Literal(Literal::Integer(2))),
                     BinaryOp::Mul,
-                    Box::new(Expr::Literal(Literal::Integer("3".to_owned())))
+                    Box::new(Expr::Literal(Literal::Integer(3)))
                 ))
             )
         ),
@@ -122,8 +122,8 @@ test_parse!(
             Expr::Between {
                 expr: Box::new(Expr::QualifiedColumn(None, None, "a".to_owned())),
                 not: false,
-                low: Box::new(Expr::Literal(Literal::Integer("1".to_owned()))),
-                high: Box::new(Expr::Literal(Literal::Integer("10".to_owned()))),
+                low: Box::new(Expr::Literal(Literal::Integer(1))),
+                high: Box::new(Expr::Literal(Literal::Integer(10))),
             }
         ),
         // In 表达式
@@ -133,9 +133,9 @@ test_parse!(
                 expr: Box::new(Expr::QualifiedColumn(None, None, "a".to_owned())),
                 not: false,
                 list: vec![
-                    Expr::Literal(Literal::Integer("1".to_owned())),
-                    Expr::Literal(Literal::Integer("2".to_owned())),
-                    Expr::Literal(Literal::Integer("3".to_owned())),
+                    Expr::Literal(Literal::Integer(1)),
+                    Expr::Literal(Literal::Integer(2)),
+                    Expr::Literal(Literal::Integer(3)),
                 ],
             }
         ),
@@ -145,9 +145,9 @@ test_parse!(
                 expr: Box::new(Expr::QualifiedColumn(None, None, "a".to_owned())),
                 not: true,
                 list: vec![
-                    Expr::Literal(Literal::Integer("1".to_owned())),
-                    Expr::Literal(Literal::Integer("2".to_owned())),
-                    Expr::Literal(Literal::Integer("3".to_owned())),
+                    Expr::Literal(Literal::Integer(1)),
+                    Expr::Literal(Literal::Integer(2)),
+                    Expr::Literal(Literal::Integer(3)),
                 ],
             }
         ),

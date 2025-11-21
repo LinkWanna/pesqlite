@@ -230,7 +230,7 @@ test_parse!(
                     where_clause: Some(Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "eage".to_owned())),
                         BinaryOp::Gt,
-                        Box::new(Expr::Literal(Literal::Integer("30".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(30))),
                     )),
                     group_by: vec![],
                     having: None
@@ -289,7 +289,7 @@ test_parse!(
             "default 0.",
             ColumnConstraint {
                 name: None,
-                ty: ColumnConstraintType::Default(Expr::Literal(Literal::Float("0.".to_owned())))
+                ty: ColumnConstraintType::Default(Expr::Literal(Literal::Float(0.)))
             }
         ),
     ]
@@ -535,7 +535,7 @@ test_parse!(
                     value: Expr::Binary(
                         Box::new(Expr::QualifiedColumn(None, None, "age".to_owned())),
                         BinaryOp::Plus,
-                        Box::new(Expr::Literal(Literal::Integer("1".to_owned()))),
+                        Box::new(Expr::Literal(Literal::Integer(1))),
                     )
                 }],
                 from_clause: None,

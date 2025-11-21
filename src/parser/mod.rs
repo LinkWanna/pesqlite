@@ -231,11 +231,11 @@ impl Parser for Literal {
                 let bytes = str.as_bytes();
 
                 if bytes.len() >= 2 && matches!(bytes[1], b'x' | b'X') {
-                    Self::Integer(str.to_owned())
+                    Self::Integer(u64::from_str_radix(&str[2..], 16).unwrap())
                 } else if bytes.iter().any(|b| matches!(b, b'.' | b'e' | b'E')) {
-                    Self::Float(str.to_owned())
+                    Self::Float(str.parse::<f64>().unwrap())
                 } else {
-                    Self::Integer(str.to_owned())
+                    Self::Integer(u64::from_str_radix(str, 10).unwrap())
                 }
             }
             Rule::string => {
