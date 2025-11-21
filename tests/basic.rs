@@ -4,24 +4,16 @@ use common::test_parse;
 use pesqlite::*;
 
 test_parse!(
-    test_literal_double,
+    test_literal_float,
     Rule::literal,
     Literal::parse,
     [
-        ("123e-1", Literal::Double("123e-1".to_owned())),
-        ("123e+2", Literal::Double("123e+2".to_owned())),
-        ("123.1e+2", Literal::Double("123.1e+2".to_owned())),
-    ]
-);
-
-test_parse!(
-    test_literal_decimal,
-    Rule::literal,
-    Literal::parse,
-    [
-        ("123.", Literal::Decimal("123.".to_owned())),
-        ("123.12", Literal::Decimal("123.12".to_owned())),
-        (".5", Literal::Decimal(".5".to_owned())),
+        ("123e-1", Literal::Float("123e-1".to_owned())),
+        ("123e+2", Literal::Float("123e+2".to_owned())),
+        ("123.1e+2", Literal::Float("123.1e+2".to_owned())),
+        ("123.", Literal::Float("123.".to_owned())),
+        ("123.12", Literal::Float("123.12".to_owned())),
+        (".5", Literal::Float(".5".to_owned())),
     ]
 );
 
@@ -31,8 +23,8 @@ test_parse!(
     Literal::parse,
     [
         ("123", Literal::Integer("123".to_owned())),
-        ("+123", Literal::Integer("+123".to_owned())),
-        ("-123", Literal::Integer("-123".to_owned())),
+        ("0x123", Literal::Integer("0x123".to_owned())),
+        ("0X123", Literal::Integer("0X123".to_owned())),
     ]
 );
 

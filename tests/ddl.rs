@@ -289,7 +289,7 @@ test_parse!(
             "default 0.",
             ColumnConstraint {
                 name: None,
-                ty: ColumnConstraintType::Default(Expr::Literal(Literal::Decimal("0.".to_owned())))
+                ty: ColumnConstraintType::Default(Expr::Literal(Literal::Float("0.".to_owned())))
             }
         ),
     ]

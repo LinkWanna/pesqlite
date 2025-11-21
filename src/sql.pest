@@ -1,6 +1,6 @@
 // 对外接口
 stmts_end          = _{ SOI ~ stmts ~ EOI }
-stmt_end           = _{ SOI ~ stmt ~ EOI }
+stmt_end           = _{ SOI ~ stmt ~ ";"? ~ EOI }
 create_table_end   = _{ SOI ~ create_table ~ EOI }
 create_view_end    = _{ SOI ~ create_view ~ EOI }
 create_index_end   = _{ SOI ~ create_index ~ EOI }
@@ -232,19 +232,22 @@ exclusive        =  { ^"EXCLUSIVE" }
 /* -------------------------- 词法定义 -------------------------- */
 
 /// 字面量
-literal =  { true | false | null | double | decimal | integer | string | blob | current_timestamp | current_time | current_date }
-true    =  { ^"TRUE" }
-false   =  { ^"FALSE" }
-null    =  { ^"NULL" }
-double  = @{ integer? ~ ("." ~ ASCII_DIGIT*)? ~ (^"E" ~ integer) }
-decimal = @{ integer? ~ ("." ~ ASCII_DIGIT*) }
-integer = @{ ("+" | "-")? ~ ASCII_DIGIT+ }
-string  = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
-blob    = @{ ^"X" ~ "'" ~ (ASCII_HEX_DIGIT)* ~ "'" }
+literal           =  { true | false | null | numeric | string | blob | current_timestamp | current_time | current_date }
+true              =  { ^"TRUE" }
+false             =  { ^"FALSE" }
+null              =  { ^"NULL" }
+numeric           = @{ hex | decimal }
+string            = @{ "'" ~ (!"'" ~ ANY)* ~ "'" }
+blob              = @{ ^"X" ~ "'" ~ (ASCII_HEX_DIGIT)* ~ "'" }
+current_time      =  { ^"CURRENT_TIME" }
+current_date      =  { ^"CURRENT_DATE" }
+current_timestamp =  { ^"CURRENT_TIMESTAMP" }
 
-current_time      = { ^"CURRENT_TIME" }
-current_date      = { ^"CURRENT_DATE" }
-current_timestamp = { ^"CURRENT_TIMESTAMP" }
+unsigned = @{ ASCII_DIGIT+ }
+hex      = @{ ^"0x" ~ ASCII_HEX_DIGIT+ }
+decimal  = @{ (decimal1 | decimal2) ~ (^"E" ~ ("+" | "-")? ~ unsigned)? }
+decimal1 = @{ "." ~ ASCII_DIGIT* }
+decimal2 = @{ unsigned ~ ("." ~ ASCII_DIGIT*)? }
 
 /// 数据类型
 type_name = { ident ~ ("(" ~ unsigned ~ ("," ~ unsigned)? ~ ")")? }
@@ -482,8 +485,6 @@ keyword      =  {
   | ^"WITHOUT"
   | ^"WITH"
 }
-
-unsigned = @{ ASCII_DIGIT+ }
 
 /// 空格描述
 WHITESPACE = _{ " " | "\t" | "\n" | "\r" }

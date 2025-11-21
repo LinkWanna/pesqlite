@@ -225,9 +225,19 @@ impl Parser for Literal {
         let pair = inner.next().unwrap();
 
         match pair.as_rule() {
-            Rule::double => Self::Double(pair.as_str().to_owned()),
-            Rule::decimal => Self::Decimal(pair.as_str().to_owned()),
-            Rule::integer => Self::Integer(pair.as_str().to_owned()),
+            Rule::numeric => {
+                // 检查是否有 '.' 或 'e'/'E' 来判断是整数还是实数
+                let str = pair.as_str();
+                let bytes = str.as_bytes();
+
+                if bytes.len() >= 2 && matches!(bytes[1], b'x' | b'X') {
+                    Self::Integer(str.to_owned())
+                } else if bytes.iter().any(|b| matches!(b, b'.' | b'e' | b'E')) {
+                    Self::Float(str.to_owned())
+                } else {
+                    Self::Integer(str.to_owned())
+                }
+            }
             Rule::string => {
                 let str = pair.as_str();
                 Self::String(str[1..str.len() - 1].to_owned())

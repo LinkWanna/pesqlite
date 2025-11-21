@@ -29,9 +29,8 @@ pub enum Stmt {
 /// 字面量
 #[derive(Clone, Debug, PartialEq)]
 pub enum Literal {
-    Double(String),   // 浮点数
-    Decimal(String),  // 整数
-    Integer(String),  // 有符号整数
+    Integer(String),  // 整数字面量
+    Float(String),    // 浮点数字面量
     String(String),   // 字符串字面量
     Blob(String),     // 二进制字面量
     Null,             // NULL
