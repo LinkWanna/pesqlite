@@ -27,7 +27,7 @@ test_parse!(
                         ColumnDef {
                             name: "id".to_owned(),
                             col_type: Some(TypeName {
-                                name: "integer".to_owned(),
+                                affinity: Affinity::Integer,
                                 size: None,
                             }),
                             constraints: vec![],
@@ -35,7 +35,7 @@ test_parse!(
                         ColumnDef {
                             name: "name".to_owned(),
                             col_type: Some(TypeName {
-                                name: "varchar".to_owned(),
+                                affinity: Affinity::Text,
                                 size: Some(TypeSize::MaxSize("255".to_owned())),
                             }),
                             constraints: vec![
@@ -52,7 +52,7 @@ test_parse!(
                         ColumnDef {
                             name: "age".to_owned(),
                             col_type: Some(TypeName {
-                                name: "int".to_owned(),
+                                affinity: Affinity::Integer,
                                 size: None,
                             }),
                             constraints: vec![
@@ -133,7 +133,7 @@ test_parse!(
                 action: AlterTableAction::AddColumn(ColumnDef {
                     name: "email".to_owned(),
                     col_type: Some(TypeName {
-                        name: "int".to_owned(),
+                        affinity: Affinity::Integer,
                         size: None,
                     }),
                     constraints: vec![],
@@ -303,14 +303,14 @@ test_parse!(
         (
             "decimal(10, 2)",
             TypeName {
-                name: "decimal".to_owned(),
+                affinity: Affinity::Numeric,
                 size: Some(TypeSize::TypeSize("10".to_owned(), "2".to_owned())),
             }
         ),
         (
             "varchar(255)",
             TypeName {
-                name: "varchar".to_owned(),
+                affinity: Affinity::Text,
                 size: Some(TypeSize::MaxSize("255".to_owned())),
             }
         ),
@@ -385,7 +385,7 @@ test_parse!(
             ColumnDef {
                 name: "name".to_owned(),
                 col_type: Some(TypeName {
-                    name: "varchar".to_owned(),
+                    affinity: Affinity::Text,
                     size: Some(TypeSize::MaxSize("255".to_owned())),
                 }),
                 constraints: vec![
@@ -405,7 +405,7 @@ test_parse!(
             ColumnDef {
                 name: "name".to_owned(),
                 col_type: Some(TypeName {
-                    name: "int".to_owned(),
+                    affinity: Affinity::Integer,
                     size: None,
                 }),
                 constraints: vec![],
@@ -427,7 +427,7 @@ test_parse!(
             ColumnDef {
                 name: "id".to_owned(),
                 col_type: Some(TypeName {
-                    name: "integer".to_owned(),
+                    affinity: Affinity::Integer,
                     size: None,
                 }),
                 constraints: vec![ColumnConstraint {
@@ -480,7 +480,7 @@ test_parse!(
                 cols: vec![ColumnDef {
                     name: "id".to_owned(),
                     col_type: Some(TypeName {
-                        name: "integer".to_owned(),
+                        affinity: Affinity::Integer,
                         size: None,
                     }),
                     constraints: vec![],

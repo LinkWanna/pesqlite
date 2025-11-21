@@ -100,8 +100,19 @@ pub struct ColumnDef {
 /// 字段类型
 #[derive(Clone, Debug, PartialEq)]
 pub struct TypeName {
-    pub name: String, // 类型名称，由后端解析为具体类型
+    pub affinity: Affinity,
     pub size: Option<TypeSize>,
+}
+
+/// 类型亲和力
+/// https://www.sqlite.org/datatype3.html#type_affinity
+#[derive(Clone, Debug, PartialEq)]
+pub enum Affinity {
+    Integer,
+    Real,
+    Numeric,
+    Text,
+    Blob,
 }
 
 /// 字段类型大小

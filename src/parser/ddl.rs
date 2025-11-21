@@ -217,8 +217,19 @@ impl Parser for TypeName {
         let mut inner = pair.into_inner();
         let pair = inner.next().unwrap();
 
-        // 解析类型名称
-        let name = String::parse(pair);
+        // 解析类型亲和性
+        let str = String::parse(pair);
+        let affinity = if str.contains("int") {
+            Affinity::Integer
+        } else if str.contains("char") || str.contains("clob") || str.contains("text") {
+            Affinity::Text
+        } else if str.contains("blob") {
+            Affinity::Blob
+        } else if str.contains("real") || str.contains("floa") || str.contains("doub") {
+            Affinity::Real
+        } else {
+            Affinity::Numeric // 默认亲和性
+        };
 
         // 解析类型大小（可选）
         let size = match (inner.next(), inner.next()) {
@@ -230,7 +241,7 @@ impl Parser for TypeName {
             _ => None,
         };
 
-        Self { name, size }
+        Self { affinity, size }
     }
 }
 
