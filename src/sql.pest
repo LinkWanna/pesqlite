@@ -330,13 +330,13 @@ temp           = { ^"TEMP" | ^"TEMPORARY" }
 if_exists      = { ^"IF" ~ ^"EXISTS" }
 if_not_exists  = { ^"IF" ~ ^"NOT" ~ ^"EXISTS" }
 
-idents       =  { ident ~ ("," ~ ident)* }
-ident        =  { quoted_ident | ident_inner }
-quoted_ident = @{ "\"" ~ ident_inner ~ "\"" }
-ident_inner  = @{ !(keyword ~ !ident_cont) ~ (ident_start ~ (ident_cont)*) }
-ident_start  = @{ ASCII_ALPHA | "_" }
-ident_cont   = @{ ASCII_ALPHANUMERIC | "_" }
-keyword      =  {
+idents         =  { ident ~ ("," ~ ident)* }
+ident          =  { quoted_ident | ident_bare }
+quoted_ident   = @{ "\"" ~ ident_start ~ (ident_continue)* ~ "\"" }
+ident_bare     = @{ !(keyword ~ !ident_continue) ~ (ident_start ~ (ident_continue)*) }
+ident_start    = @{ ASCII_ALPHA | "_" }
+ident_continue = @{ ASCII_ALPHANUMERIC | "_" }
+keyword        =  {
     ^"ABORT"
   | ^"ACTION"
   | ^"ADD"

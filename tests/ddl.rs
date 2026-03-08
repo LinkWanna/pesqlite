@@ -99,6 +99,51 @@ test_parse!(
                 }
             }
         ),
+        (
+            "CREATE TABLE audit (
+                id INT,
+                \"action\" VARCHAR(20),
+                detail VARCHAR(20)
+            )",
+            CreateTable {
+                temp: false,
+                if_not_exists: false,
+                schema_table: SchemaObject {
+                    schema_name: None,
+                    name: "audit".to_owned(),
+                },
+                body: CreateTableBody::Columns {
+                    cols: vec![
+                        ColumnDef {
+                            name: "id".to_owned(),
+                            col_type: Some(TypeName {
+                                affinity: Affinity::Integer,
+                                size: None,
+                            }),
+                            constraints: vec![],
+                        },
+                        ColumnDef {
+                            name: "action".to_owned(),
+                            col_type: Some(TypeName {
+                                affinity: Affinity::Text,
+                                size: Some(TypeSize::MaxSize("20".to_owned())),
+                            }),
+                            constraints: vec![],
+                        },
+                        ColumnDef {
+                            name: "detail".to_owned(),
+                            col_type: Some(TypeName {
+                                affinity: Affinity::Text,
+                                size: Some(TypeSize::MaxSize("20".to_owned())),
+                            }),
+                            constraints: vec![],
+                        },
+                    ],
+                    constraints: vec![],
+                    options: vec![],
+                }
+            }
+        ),
     ]
 );
 
