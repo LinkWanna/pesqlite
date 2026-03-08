@@ -105,7 +105,7 @@ pub struct TypeName {
 }
 
 /// 类型亲和力
-/// https://www.sqlite.org/datatype3.html#type_affinity
+/// <https://www.sqlite.org/datatype3.html#type_affinity>
 #[derive(Clone, Debug, PartialEq)]
 pub enum Affinity {
     Integer,

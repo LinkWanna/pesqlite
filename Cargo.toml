@@ -2,6 +2,14 @@
 name = "pesqlite"
 version = "0.1.2"
 edition = "2024"
+description = "A pest-based SQL parser tailored for lightweight SQLite-compatible queries."
+authors = ["LinkWanna"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/LinkWanna/pesqlite"
+documentation = "https://docs.rs/pesqlite"
+readme = "README.md"
+keywords = ["sqlite", "parser", "sql", "pest"]
+categories = ["parsing", "database"]
 
 [dependencies]
 lazy_static = "1.5"
