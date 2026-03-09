@@ -30,6 +30,11 @@ impl Parser for Stmt {
             Rule::drop_index => Stmt::DropIndex(DropIndex::parse(pair)),
             Rule::drop_view => Stmt::DropView(DropView::parse(pair)),
             Rule::drop_trigger => Stmt::DropTrigger(DropTrigger::parse(pair)),
+            Rule::begin => Stmt::Begin(Begin::parse(pair)),
+            Rule::commit => Stmt::Commit(Commit::parse(pair)),
+            Rule::rollback => Stmt::Rollback(Rollback::parse(pair)),
+            Rule::savepoint => Stmt::Savepoint(Savepoint::parse(pair)),
+            Rule::release => Stmt::Release(Release::parse(pair)),
             _ => unreachable!("Unexpected statement rule: {:?}", pair.as_rule()),
         }
     }

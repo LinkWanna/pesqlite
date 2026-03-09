@@ -24,6 +24,13 @@ pub enum Stmt {
     DropIndex(DropIndex),
     DropView(DropView),
     DropTrigger(DropTrigger),
+
+    // 事务控制语言（TCL）
+    Begin(Begin),
+    Commit(Commit),
+    Rollback(Rollback),
+    Savepoint(Savepoint),
+    Release(Release),
 }
 
 /// 字面量

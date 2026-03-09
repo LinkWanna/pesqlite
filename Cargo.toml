@@ -1,6 +1,6 @@
 [package]
 name = "pesqlite"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 description = "A pest-based SQL parser tailored for lightweight SQLite-compatible queries."
 authors = ["LinkWanna"]
