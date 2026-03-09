@@ -108,6 +108,39 @@ test_parse!(
                 group_by: vec![],
                 having: None
             })
+        ),
+        (
+            "SELECT id, user_id, product_id, amount, note FROM orders",
+            SelectCore::Query(Query {
+                is_distinct: false,
+                cols: vec![
+                    ResultColumn::Expr(Expr::QualifiedColumn(None, None, "id".to_owned()), None),
+                    ResultColumn::Expr(
+                        Expr::QualifiedColumn(None, None, "user_id".to_owned()),
+                        None
+                    ),
+                    ResultColumn::Expr(
+                        Expr::QualifiedColumn(None, None, "product_id".to_owned()),
+                        None
+                    ),
+                    ResultColumn::Expr(
+                        Expr::QualifiedColumn(None, None, "amount".to_owned()),
+                        None
+                    ),
+                    ResultColumn::Expr(Expr::QualifiedColumn(None, None, "note".to_owned()), None),
+                ],
+                from_clause: Some(FromClause::TableOrQuerys(vec![QualifiedTable {
+                    schema_table: SchemaObject {
+                        schema_name: None,
+                        name: "orders".to_owned(),
+                    },
+                    alias: None,
+                    indexed: None,
+                }])),
+                where_clause: None,
+                group_by: vec![],
+                having: None
+            })
         )
     ]
 );

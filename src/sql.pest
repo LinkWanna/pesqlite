@@ -265,7 +265,7 @@ prefix      = _{ logical_not | bitwise_not | positive | negative }
 bitwise_not =  { "~" }
 positive    =  { "+" }
 negative    =  { "-" }
-logical_not =  { ^"NOT" }
+logical_not =  { ^"NOT " }
 
 // 中缀运算符
 infix       = _{
